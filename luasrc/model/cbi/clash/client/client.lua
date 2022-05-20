@@ -7,6 +7,10 @@ local uci = require("luci.model.uci").cursor()
 local fs = require "luci.clash"
 local clash = "clash"
 
+local CORE_CLASH = "/etc/clash/clash"
+local CORE_CLASH_TUN = "/etc/clash/clashtun/clash"
+local CORE_CLASH_DTUN = "/etc/clash/dtun/clash"
+
 
 m = Map("clash")
 s = m:section(TypedSection, "clash")
@@ -15,13 +19,13 @@ m.pageaction = false
 
 o = s:option(ListValue, "core", translate("Core"))
 o.default = "clashcore"
-if nixio.fs.access("/etc/clash/clash") then
+if nixio.fs.access(CORE_CLASH) then
 o:value("1", translate("Clash"))
 end
-if nixio.fs.access("/etc/clash/clashtun/clash") then
+if nixio.fs.access(CORE_CLASH_TUN) then
 o:value("3", translate("Clash(cTun)"))
 end
-if nixio.fs.access("/etc/clash/dtun/clash") then
+if nixio.fs.access(CORE_CLASH_DTUN) then
 o:value("4", translate("Clash(premium)"))
 end
 

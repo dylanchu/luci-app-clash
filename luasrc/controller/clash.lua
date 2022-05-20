@@ -3,6 +3,10 @@ local fs=require"nixio.fs"
 local http=require"luci.http"
 local uci=require"luci.model.uci".cursor()
 
+local CORE_CLASH = "/etc/clash/clash"
+local CORE_CLASH_TUN = "/etc/clash/clashtun/clash"
+local CORE_CLASH_DTUN = "/etc/clash/dtun/clash"
+local GEOIP_FILE = "/etc/clash/Country.mmdb"
 
 
 function index()
@@ -210,10 +214,10 @@ end
 
 
 local function clash_core()
-	if nixio.fs.access("/etc/clash/clash") then
-		local core=luci.sys.exec("/etc/clash/clash -v 2>/dev/null |awk -F ' ' '{print $2}'")
+	if nixio.fs.access(CORE_CLASH) then
+		local core=luci.sys.exec(CORE_CLASH .. " -v 2>/dev/null |awk -F ' ' '{print $2}'")
 		if core ~= "" then
-			return luci.sys.exec("/etc/clash/clash -v 2>/dev/null |awk -F ' ' '{print $2}'")
+			return luci.sys.exec(CORE_CLASH .. " -v 2>/dev/null |awk -F ' ' '{print $2}'")
 		else
 			return luci.sys.exec("sed -n 1p /usr/share/clash/core_version")
 		end
@@ -226,10 +230,10 @@ end
 
 
 local function clashtun_core()
-	if nixio.fs.access("/etc/clash/clashtun/clash") then
-		local tun=luci.sys.exec("/etc/clash/clashtun/clash -v 2>/dev/null |awk -F ' ' '{print $2}'")
+	if nixio.fs.access(CORE_CLASH_TUN) then
+		local tun=luci.sys.exec(CORE_CLASH_TUN .. " -v 2>/dev/null |awk -F ' ' '{print $2}'")
 		if tun ~= "" then
-			return luci.sys.exec("/etc/clash/clashtun/clash -v 2>/dev/null |awk -F ' ' '{print $2}'")
+			return luci.sys.exec(CORE_CLASH_TUN .. " -v 2>/dev/null |awk -F ' ' '{print $2}'")
 		else 
 			return luci.sys.exec("sed -n 1p /usr/share/clash/tun_version")
 		end
@@ -240,10 +244,10 @@ end
 
 
 local function dtun_core()
-	if nixio.fs.access("/etc/clash/dtun/clash") then
-		local tun=luci.sys.exec("/etc/clash/dtun/clash -v 2>/dev/null |awk -F ' ' '{print $2}'")
+	if nixio.fs.access(CORE_CLASH_DTUN) then
+		local tun=luci.sys.exec(CORE_CLASH_DTUN .. " -v 2>/dev/null |awk -F ' ' '{print $2}'")
 		if tun ~= "" then
-			return luci.sys.exec("/etc/clash/dtun/clash -v 2>/dev/null |awk -F ' ' '{print $2}'")
+			return luci.sys.exec(CORE_CLASH_DTUN .. " -v 2>/dev/null |awk -F ' ' '{print $2}'")
 		else 
 			return luci.sys.exec("sed -n 1p /usr/share/clash/dtun_core_version")
 		end		
@@ -258,7 +262,7 @@ local function readlog()
 end
 
 local function geo_data()
-	return os.date("%Y-%m-%d %H:%M:%S",fss.mtime("/etc/clash/Country.mmdb"))
+	return os.date("%Y-%m-%d %H:%M:%S",fss.mtime(GEOIP_FILE))
 end
 
 local function downcheck()

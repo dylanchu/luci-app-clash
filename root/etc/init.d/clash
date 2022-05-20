@@ -3,9 +3,13 @@
 START=99
 STOP=15
 
-CLASH="/etc/clash/clash"
-CLASHT="/etc/clash/clashtun/clash"
-CLASHD="/etc/clash/dtun/clash"
+# CORE_CLASH="/tmp/core_clash"  # TODO: support small ROM device
+CORE_CLASH="/etc/clash/clash"
+CORE_CLASH_TUN="/etc/clash/clashtun/clash"
+CORE_CLASH_DTUN="/etc/clash/dtun/clash"
+
+GEOIP_FILE="/etc/clash/Country.mmdb"
+
 CLASH_CONFIG="/etc/clash"
 CRON_FILE="/etc/crontabs/root"
 CONFIG_YAML="/etc/clash/config.yaml"
@@ -448,35 +452,35 @@ if [ "${enable}" -eq 1 ]; then
 	sleep 1
 	
 
-if [ "${core}" -eq 1 ] && [ ! -f /etc/clash/clash ]; then
+if [ "${core}" -eq 1 ] && [ ! -f ${CORE_CLASH} ]; then
 	if [ "${lang}" == "en" ] || [ $lang == "auto" ];then
 		echo "  $(date "+%Y-%m-%d %H:%M:%S") - clash core not found,  download and install clash from update page  " >> /usr/share/clash/clash.txt
 		echo "clash core not found,  download and install clash from update page" >> $REAL_LOG
 	elif [ "${lang}" == "zh_cn" ];then
-		echo "  $(date "+%Y-%m-%d %H:%M:%S")  - 找不到/etc/clash/clash,请从更新页下载clash内核" >> /usr/share/clash/clash.txt
-		echo "找不到/etc/clash/clash,请从更新页下载clash内核" >> $REAL_LOG			
+		echo "  $(date "+%Y-%m-%d %H:%M:%S")  - 找不到${CORE_CLASH},请从更新页下载clash内核" >> /usr/share/clash/clash.txt
+		echo "找不到${CORE_CLASH},请从更新页下载clash内核" >> $REAL_LOG			
 	fi
 
 	echo "Clash for OpenWRT" >$REAL_LOG
 	exit 0
-elif  [ "${core}" -eq 3 ] && [ ! -f /etc/clash/clashtun/clash ]; then
+elif  [ "${core}" -eq 3 ] && [ ! -f ${CORE_CLASH_TUN} ]; then
 	if [ "${lang}" == "en" ] || [ $lang == "auto" ];then
-		echo "  $(date "+%Y-%m-%d %H:%M:%S") - clash Tun core not found in /etc/clash/clashtun/clash " >> /usr/share/clash/clash.txt
-		echo "clash Tun core not found in /etc/clash/clashtun/clash" >> $REAL_LOG
+		echo "  $(date "+%Y-%m-%d %H:%M:%S") - clash Tun core not found in ${CORE_CLASH_TUN} " >> /usr/share/clash/clash.txt
+		echo "clash Tun core not found in ${CORE_CLASH_TUN}" >> $REAL_LOG
 	elif [ "${lang}" == "zh_cn" ];then
-		echo "  $(date "+%Y-%m-%d %H:%M:%S")  - 找不到/etc/clash/clashtun/clash, clash Tun内核" >> /usr/share/clash/clash.txt
-		echo "找不到/etc/clash/clashtun/clash, clash Tun内核" >> $REAL_LOG	
+		echo "  $(date "+%Y-%m-%d %H:%M:%S")  - 找不到${CORE_CLASH_TUN}, clash Tun内核" >> /usr/share/clash/clash.txt
+		echo "找不到${CORE_CLASH_TUN}, clash Tun内核" >> $REAL_LOG	
 	fi	
 	sleep 1
 	echo "Clash for OpenWRT" >$REAL_LOG
 	exit 0
-elif  [ "${core}" -eq 4 ] && [ ! -f /etc/clash/dtun/clash ]; then
+elif  [ "${core}" -eq 4 ] && [ ! -f ${CORE_CLASH_DTUN} ]; then
 	if [ "${lang}" == "en" ] || [ $lang == "auto" ];then
-		echo "  $(date "+%Y-%m-%d %H:%M:%S") - clash Tun core not found in /etc/clash/dtun/clash  " >> /usr/share/clash/clash.txt
-		echo "clash Tun core not found in /etc/clash/dtun/clash" >> $REAL_LOG
+		echo "  $(date "+%Y-%m-%d %H:%M:%S") - clash Tun core not found in ${CORE_CLASH_DTUN}  " >> /usr/share/clash/clash.txt
+		echo "clash Tun core not found in ${CORE_CLASH_DTUN}" >> $REAL_LOG
 	elif [ "${lang}" == "zh_cn" ];then
 		echo "  $(date "+%Y-%m-%d %H:%M:%S")  - 找不到/usr/bin/clash clash Tun" >> /usr/share/clash/clash.txt
-		echo "找不到/etc/clash/dtun/clash,clash Tun" >> $REAL_LOG		
+		echo "找不到${CORE_CLASH_DTUN},clash Tun" >> $REAL_LOG		
 	fi
 
 	echo "Clash for OpenWRT" >$REAL_LOG
@@ -520,7 +524,7 @@ if  [  -f $CONFIG_YAML ] && [ "$(ls -l $CONFIG_YAML|awk '{print int($5)}')" -ne 
 
 	if [ ! -z "$(egrep '^ {0,}rule-providers:' "/etc/clash/config.yaml")" ] && [ "$(uci get clash.config.core)" -ne 4 ];then
 		
-		if [ -f /etc/clash/dtun/clash ];then
+		if [ -f ${CORE_CLASH_DTUN} ];then
 		uci set clash.config.core="4" && uci commit clash
 		sleep 1
 		else
@@ -537,7 +541,7 @@ if  [  -f $CONFIG_YAML ] && [ "$(ls -l $CONFIG_YAML|awk '{print int($5)}')" -ne 
 	fi
 	
 	if [ ! -z "$(egrep '^ {0,}script:' "/etc/clash/config.yaml")" ] && [ "$(uci get clash.config.core)" -ne 4 ];then
-		if [ -f /etc/clash/dtun/clash ];then
+		if [ -f ${CORE_CLASH_DTUN} ];then
 		uci set clash.config.core="4" && uci commit clash
 		sleep 1
 		else
@@ -563,7 +567,7 @@ if  [  -f $CONFIG_YAML ] && [ "$(ls -l $CONFIG_YAML|awk '{print int($5)}')" -ne 
    	yml_change >/dev/null 2>&1
 	
 
-	if [ ! -f /etc/clash/Country.mmdb ];then
+	if [ ! -f ${GEOIP_FILE} ];then
 		if [ "${lang}" == "en" ] || [ $lang == "auto" ];then
 			echo "Cannot find Country.mmdb" >$REAL_LOG 
 		elif [ "${lang}" == "zh_cn" ];then
@@ -594,7 +598,7 @@ if  [  -f $CONFIG_YAML ] && [ "$(ls -l $CONFIG_YAML|awk '{print int($5)}')" -ne 
 	
         
     if [ "$(uci get clash.config.core)" -eq 1 ];then
-        	nohup $CLASH -d "$CLASH_CONFIG" > /usr/share/clash/clash.txt 2>&1 &	
+        	nohup $CORE_CLASH -d "$CLASH_CONFIG" > /usr/share/clash/clash.txt 2>&1 &	
 		
 		if [ "${lang}" == "en" ] || [ $lang == "auto" ];then
 			echo "Clash Core Started Successfully " >$REAL_LOG 
@@ -603,7 +607,7 @@ if  [  -f $CONFIG_YAML ] && [ "$(ls -l $CONFIG_YAML|awk '{print int($5)}')" -ne 
 		fi
 		
 	elif [ "$(uci get clash.config.core)" -eq 3 ];then
-       	 	nohup $CLASHT -d "$CLASH_CONFIG" > /usr/share/clash/clash.txt 2>&1 &	
+       	 	nohup $CORE_CLASH_TUN -d "$CLASH_CONFIG" > /usr/share/clash/clash.txt 2>&1 &	
 		
 		if [ "${lang}" == "en" ] || [ $lang == "auto" ];then
 			echo "Clash Core Started Successfully " >$REAL_LOG 
@@ -611,7 +615,7 @@ if  [  -f $CONFIG_YAML ] && [ "$(ls -l $CONFIG_YAML|awk '{print int($5)}')" -ne 
 			echo "Clash 计划任务,启动进程守护程序..." >$REAL_LOG
 		fi	
 	elif [ "$(uci get clash.config.core)" -eq 4 ];then
-       	 	nohup $CLASHD -d "$CLASH_CONFIG" > /usr/share/clash/clash.txt 2>&1 &	
+       	 	nohup $CORE_CLASH_DTUN -d "$CLASH_CONFIG" > /usr/share/clash/clash.txt 2>&1 &	
 		
 		if [ "${lang}" == "en" ] || [ $lang == "auto" ];then
 			echo "Clash Core Started Successfully " >$REAL_LOG 

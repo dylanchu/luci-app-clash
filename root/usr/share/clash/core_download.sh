@@ -1,4 +1,10 @@
 #!/bin/sh
+
+# CORE_CLASH="/tmp/core_clash"  # TODO: support small ROM device
+CORE_CLASH="/etc/clash/clash"
+CORE_CLASH_TUN="/etc/clash/clashtun/clash"
+CORE_CLASH_DTUN="/etc/clash/dtun/clash"
+
 LOGTIME=$(date "+%Y-%m-%d %H:%M:%S")
 LOG_FILE="/tmp/clash_update.txt"
 MODELTYPE=$(uci get clash.config.download_core 2>/dev/null)
@@ -119,8 +125,8 @@ update(){
 			fi
 			  
 		    if [ $CORETYPE -eq 1 ];then
-			  rm -rf /etc/clash/clash >/dev/null 2>&1
-			  mv /tmp/clash /etc/clash/clash >/dev/null 2>&1
+			  rm -rf ${CORE_CLASH} >/dev/null 2>&1
+			  mv /tmp/clash ${CORE_CLASH} >/dev/null 2>&1
 			  rm -rf /usr/share/clash/core_version >/dev/null 2>&1
 			  mv /usr/share/clash/download_core_version /usr/share/clash/core_version >/dev/null 2>&1
 
@@ -131,8 +137,8 @@ update(){
 			 fi
 
 			elif [ $CORETYPE -eq 3 ];then
-			  rm -rf /etc/clash/clashtun/clash >/dev/null 2>&1
-			  mv /tmp/clash /etc/clash/clashtun/clash >/dev/null 2>&1
+			  rm -rf ${CORE_CLASH_TUN} >/dev/null 2>&1
+			  mv /tmp/clash ${CORE_CLASH_TUN} >/dev/null 2>&1
 			  rm -rf /usr/share/clash/tun_version >/dev/null 2>&1
 			  mv /usr/share/clash/download_tun_version /usr/share/clash/tun_version >/dev/null 2>&1
 			  tun=$(sed -n 1p /usr/share/clash/tun_version 2>/dev/null)

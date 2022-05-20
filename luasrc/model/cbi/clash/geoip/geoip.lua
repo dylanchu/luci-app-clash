@@ -13,6 +13,8 @@ font_off = [[</font>]]
 bold_on  = [[<strong>]]
 bold_off = [[</strong>]]
 
+local GEOIP_FILE = "/etc/clash/Country.mmdb"
+
 
 k = Map(clash)
 k.reset = false
@@ -32,14 +34,13 @@ o.template = "clash/clash_upload"
 um = s:option(DummyValue, "", nil)
 um.template = "clash/clash_dvalue"
 
-local dir, fd
-dir = "/etc/clash/"
+local fd
 http.setfilehandler(
 	function(meta, chunk, eof)
 		if not fd then
 			if not meta then return end
 
-			if	meta and chunk then fd = nixio.open(dir .. meta.file, "w") end
+			if	meta and chunk then fd = nixio.open(GEOIP_FILE, "w") end
 
 			if not fd then
 				um.value = translate("upload file error.")
@@ -52,8 +53,8 @@ http.setfilehandler(
 		if eof and fd then
 			fd:close()
 			fd = nil
-			um.value = translate("File saved to") .. ' "/etc/clash/"'
-			SYS.call("chmod + x /etc/clash/Country.mmdb")
+			um.value = translate("File saved to") .. ' ' .. GEOIP_FILE
+			SYS.call("chmod + x " .. GEOIP_FILE)
 			if luci.sys.call("pidof clash >/dev/null") == 0 then
 			SYS.call("/etc/init.d/clash restart >/dev/null 2>&1 &")
 			end
@@ -102,8 +103,10 @@ o:value("4", translate("Every Thursday"))
 o:value("5", translate("Every Friday"))
 o:value("6", translate("Every Saturday"))
 o:value("0", translate("Every Sunday"))
-update_time = SYS.exec("ls -l --full-time /etc/clash/Country.mmdb|awk '{print $6,$7;}'")
-o.description = translate("Update Time")..'- ' ..font_red..bold_on..update_time..bold_off..font_off..' '
+local update_time_tpl = "ls -l --full-time %s|awk '{print $6,$7;}'"
+update_time = SYS.exec(string.format(update_time_tpl, GEOIP_FILE))
+local desc = translate("Update Time")..'- ' ..font_red..bold_on..update_time..bold_off..font_off..' '
+o.description = desc
 o:depends("up_time", "weekly")
 
 o = s:option(ListValue, "geo_update_week", translate("Update Day (Day of Month)"))
@@ -112,8 +115,7 @@ o:value("7", translate("Every 7th Day"))
 o:value("14", translate("Every 14th Day"))
 o:value("21", translate("Every 21st Day"))
 o:value("28", translate("Every 28th Day"))
-update_time = SYS.exec("ls -l --full-time /etc/clash/Country.mmdb|awk '{print $6,$7;}'")
-o.description = translate("Update Time")..'- ' ..font_red..bold_on..update_time..bold_off..font_off..' '
+o.description = desc
 o:depends("up_time", "monthly")
 
 o = s:option(ListValue, "geoip_source", translate("GeoIP Source"))

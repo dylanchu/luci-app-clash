@@ -13,6 +13,10 @@ font_off = [[</font>]]
 bold_on  = [[<strong>]]
 bold_off = [[</strong>]]
 
+-- env:
+local CORE_CLASH = "/etc/clash/clash"
+local CORE_CLASH_TUN = "/etc/clash/clashtun/clash"
+local CORE_CLASH_DTUN = "/etc/clash/dtun/clash"
 
 
 ko = Map("clash")
@@ -38,10 +42,7 @@ o.template = "clash/upload_core"
 um = sul:option(DummyValue, "", nil)
 um.template = "clash/clash_dvalue"
 
-local dir, fd,dtun,ctun,cssr
-dir = "/etc/clash/"
-dtun="/etc/clash/dtun/"
-ctun="/etc/clash/clashtun/"
+local fd,cssr
 
 http.setfilehandler(
 	function(meta, chunk, eof)
@@ -50,11 +51,11 @@ http.setfilehandler(
 			if not meta then return end
 			
 			if fp == "clash" then
-			   if meta and chunk then fd = nixio.open(dir .. meta.file, "w") end
+			   if meta and chunk then fd = nixio.open(CORE_CLASH, "w") end
 			elseif fp == "clashctun" then
-			   if meta and chunk then fd = nixio.open(ctun .. meta.file, "w") end
+			   if meta and chunk then fd = nixio.open(CORE_CLASH_TUN, "w") end
 			elseif fp == "clashdtun" then
-			   if meta and chunk then fd = nixio.open(dtun .. meta.file, "w") end  
+			   if meta and chunk then fd = nixio.open(CORE_CLASH_DTUN, "w") end  
 			end
 
 			if not fd then
@@ -69,18 +70,24 @@ http.setfilehandler(
 			fd:close()
 			fd = nil
 			
+			local chmod_tpl = "chmod 755 %s 2>&1 &"
+			local version_tpl = "rm -rf %s 2>/dev/null && %s -v | awk -F ' ' '{print $2}' >> %s 2>/dev/null"
+			local l_str_saved = translate("File saved to")
 			if fp == "clash" then
-			    	SYS.exec("chmod 755 /etc/clash/clash 2>&1 &")
-				SYS.exec("rm -rf /usr/share/clash/core_version 2>/dev/null && /etc/clash/clash -v | awk -F ' ' '{print $2}' >> /usr/share/clash/core_version 2>/dev/null")
-				um.value = translate("File saved to") .. ' "/etc/clash/'..meta.file..'"'
+				SYS.exec(string.format(chmod_tpl, CORE_CLASH))
+				local tmp = "/usr/share/clash/core_version"
+				SYS.exec(string.format(version_tpl, tmp, CORE_CLASH, tmp))
+				um.value = l_str_saved .. ': ' .. CORE_CLASH
 			elseif fp == "clashctun" then
-			    	SYS.exec("chmod 755 /etc/clash/clashtun/clash 2>&1 &")
-				SYS.exec("rm -rf /usr/share/clash/tun_version 2>/dev/null && /etc/clash/clashtun/clash -v | awk -F ' ' '{print $2}' >> /usr/share/clash/tun_version 2>/dev/null")
-				um.value = translate("File saved to") .. ' "/etc/clash/clashtun/'..meta.file..'"'
+				SYS.exec(string.format(chmod_tpl, CORE_CLASH_TUN))
+				local tmp = "/usr/share/clash/tun_version"
+				SYS.exec(string.format(version_tpl, tmp, CORE_CLASH_TUN, tmp))
+				um.value = l_str_saved .. ': ' .. CORE_CLASH_TUN
 			elseif fp == "clashdtun" then
-			    SYS.exec("chmod 755 /etc/clash/dtun/clash 2>&1 &")
-				SYS.exec("rm -rf /usr/share/clash/dtun_core_version 2>/dev/null && /etc/clash/dtun/clash -v | awk -F ' ' '{print $2}' >> /usr/share/clash/dtun_core_version 2>/dev/null")
-				um.value = translate("File saved to") .. ' "/etc/clash/dtun/'..meta.file..'"'  
+				SYS.exec(string.format(chmod_tpl, CORE_CLASH_DTUN))
+				local tmp = "/usr/share/clash/dtun_core_version"
+				SYS.exec(string.format(version_tpl, tmp, CORE_CLASH_DTUN, tmp))
+				um.value = l_str_saved .. ': ' .. CORE_CLASH_DTUN
 			end
 			
 			
