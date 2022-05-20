@@ -1,7 +1,6 @@
 #!/bin/sh
 
-# CORE_CLASH="/tmp/core_clash"  # TODO: support small ROM device
-CORE_CLASH="/etc/clash/clash"
+CORE_CLASH="/tmp/core_clash"
 CORE_CLASH_TUN="/etc/clash/clashtun/clash"
 CORE_CLASH_DTUN="/etc/clash/dtun/clash"
 
