@@ -28,7 +28,7 @@ revert_dns() {
 	uci delete dhcp.@dnsmasq[0].cachesize
 	rm -rf $CUSLIST $CUSLITT  $CUSLISTV $CUSLITTV 2>/dev/null
 	uci commit dhcp
-	echo "Restarting Dnsmasq..." >$REAL_LOG
+	echo "Restarting Dnsmasq..." >> $REAL_LOG
 	/etc/init.d/dnsmasq restart >/dev/null 2>&1
 #===========================================================================================================================
 }
@@ -82,15 +82,15 @@ del_cron(){
 select_config(){
 #===========================================================================================================================
 config_type=$(uci get clash.config.config_type 2>/dev/null)
-echo "Checking config file..." >$REAL_LOG
+echo "Checking config file..." >> $REAL_LOG
 
 if [  -f "$CONFIG_YAML_PATH" ] && [ "$(ls -l "$CONFIG_YAML_PATH"|awk '{print int($5)}')" -ne 0 ];then
 	cp "$CONFIG_YAML_PATH" $CONFIG_YAML 2>/dev/null
 elif [ ! -f "$CONFIG_YAML_PATH" ] && [ ! -f $CONFIG_YAML ];then
-	echo "No config file!" >$REAL_LOG
+	echo "No config file!" >> $REAL_LOG
 	exit 2001
 elif [ "$(ls -l "$CONFIG_YAML_PATH"|awk '{print int($5)}')" -eq 0 ] && [ "$(ls -l $CONFIG_YAML|awk '{print int($5)}')" -eq 0 ];then
-	echo "Your config file is EMPTY!" >$REAL_LOG
+	echo "Your config file is EMPTY!" >> $REAL_LOG
 	exit 2001
 fi
 #===========================================================================================================================
@@ -127,7 +127,7 @@ yml_dns_change(){
 	fi
 
 	if [ "$dnsforwader" -ne 0 ]; then
-		echo "Setting dns forwarder..." >$REAL_LOG
+		echo "Setting dns forwarder..." >> $REAL_LOG
 		if [ "${dns_port}" -eq 53 ]; then
 			uci del_list dhcp.@dnsmasq[0].server=127.0.0.1#$dns_port >/dev/null 2>&1
 			uci add_list dhcp.@dnsmasq[0].server=127.0.0.1#5300 >/dev/null 2>&1
@@ -140,13 +140,13 @@ yml_dns_change(){
 		uci commit dhcp
 
 		if [ "$dnscache"  -eq 0 ];then
-			echo "Disabling dns cache..." >$REAL_LOG
+			echo "Disabling dns cache..." >> $REAL_LOG
 			uci set dhcp.@dnsmasq[0].cachesize=0
 			uci commit dhcp
 		fi
 	elif [ "$dnsforwader" -ne 1 ]; then
 		if [ "$dnscache"  -eq 0 ];then
-			echo "Disabling dns cache..." >$REAL_LOG
+			echo "Disabling dns cache..." >> $REAL_LOG
 	        uci set dhcp.@dnsmasq[0].cachesize=0
 			uci commit dhcp
 		fi
@@ -382,11 +382,11 @@ fi
 
 if [ "${enable}" -ne 1 ]; then
 	echo "  $(date "+%Y-%m-%d %H:%M:%S") - client is NOT enabled, will not start." >>/usr/share/clash/clash.txt
-	echo "Error: Client is NOT enabled, will not start." >$REAL_LOG
+	echo "Error: Client is NOT enabled, will not start." >> $REAL_LOG
 	exit 1000
 fi
 
-echo "Starting client..." >$REAL_LOG
+echo "Starting client..." >> $REAL_LOG
 select_config >/dev/null 2>&1
 sleep 1
 
@@ -406,7 +406,7 @@ fi
 
 if  [ ! -f $CONFIG_YAML ] || [ "$(ls -l $CONFIG_YAML|awk '{print int($5)}')" -eq 0 ] ; then
 	echo "  $(date "+%Y-%m-%d %H:%M:%S") - Invalid config.yaml, empty or not found" >> /usr/share/clash/clash.txt
-	echo "  Error: invalid config.yaml, empty or not found" >$REAL_LOG
+	echo "  Error: invalid config.yaml, empty or not found" >> $REAL_LOG
 	exit 2001
 fi
 
@@ -415,7 +415,7 @@ fi
 	custom_list >/dev/null 2>&1
 	if [ "$core" -eq 4 ] || [ "$core" -eq 3 ];then
 		if [ $tun_mode -eq 0 ];then
-			echo "Enabling TUN..." >$REAL_LOG
+			echo "Enabling TUN..." >> $REAL_LOG
 			uci set clash.config.tun_mode="1" && uci set clash.config.stack="system" && uci commit clash
 		fi
 	fi
@@ -425,7 +425,7 @@ fi
 	if [ -z "$(grep "^ {0,}listen:" $CONFIG_YAML)" ] || [ -z "$(grep "^ {0,}enhanced-mode:" $CONFIG_YAML)" ] || [ -z "$(grep "^ {0,}dns:" $CONFIG_YAML)" ];then
 		if [ $enable_dns -eq 0 ];then
 			uci set clash.config.enable_dns="1" && uci commit clash
-			echo "Enabling custom DNS..." >$REAL_LOG
+			echo "Enabling custom DNS..." >> $REAL_LOG
 		fi
 	fi
 
@@ -434,7 +434,7 @@ fi
 			uci set clash.config.core="4" && uci commit clash
 			sleep 1
 		else
-			echo "Error: Your current config only support DTUN core" >$REAL_LOG
+			echo "Error: Your current config only support DTUN core" >> $REAL_LOG
 			remove_mark >/dev/null 2>&1
 			sleep 1
 			exit 2004
@@ -447,7 +447,7 @@ fi
 			uci set clash.config.core="4" && uci commit clash
 			sleep 1
 		else
-			echo "Error: Your current config only support DTUN core" >$REAL_LOG
+			echo "Error: Your current config only support DTUN core" >> $REAL_LOG
 			remove_mark >/dev/null 2>&1
 			exit 2004
 		fi
@@ -463,12 +463,12 @@ fi
 
 
 	if [ ! -f $GEOIP_FILE ];then
-		echo "Error: Can NOT find Country.mmdb" >$REAL_LOG
+		echo "Error: Can NOT find Country.mmdb" >> $REAL_LOG
 		exit 3001
 	fi
 
 	if [ ! -f $CONFIG_YAML ];then
-		echo "Error: Can NOT find config.yaml" >$REAL_LOG
+		echo "Error: Can NOT find config.yaml" >> $REAL_LOG
 		remove_mark >/dev/null 2>&1
 		exit 2001
 	fi
@@ -483,37 +483,37 @@ fi
 	core_type=$(uci get clash.config.core)
     if [ "$core_type" -eq 1 ];then
 		nohup $CORE_CLASH -d "$CLASH_CONF_DIR" > /usr/share/clash/clash.txt 2>&1 &
-		echo "Clash core started" >$REAL_LOG
+		echo "Clash core started" >> $REAL_LOG
 	elif [ "$core_type" -eq 3 ];then
 		nohup $CORE_CLASH_TUN -d "$CLASH_CONF_DIR" > /usr/share/clash/clash.txt 2>&1 &
-		echo "Clash core started" >$REAL_LOG
+		echo "Clash core started" >> $REAL_LOG
 	elif [ "$core_type" -eq 4 ];then
 		nohup $CORE_CLASH_DTUN -d "$CLASH_CONF_DIR" > /usr/share/clash/clash.txt 2>&1 &
-		echo "Clash core started" >$REAL_LOG
+		echo "Clash core started" >> $REAL_LOG
 	fi
 
 	ln -s /usr/share/clash/yacd /www/luci-static/yacd 2>/dev/null
 
-	echo "Setting up clash iptables..." >$REAL_LOG
+	echo "Setting up clash iptables..." >> $REAL_LOG
 	rules >/dev/null 2>&1
 
-	echo "Restarting dnsmasq..." >$REAL_LOG
+	echo "Restarting dnsmasq..." >> $REAL_LOG
 	/etc/init.d/dnsmasq restart >/dev/null 2>&1
 
 	restore >/dev/null 2>&1
 
-	echo "Setting up cron jobs..." >$REAL_LOG
+	echo "Setting up cron jobs..." >> $REAL_LOG
 	add_cron
 
 	sleep 1
-	echo "Check if clash is running..." >$REAL_LOG
+	echo "Check if clash is running..." >> $REAL_LOG
 	if ! pidof clash_core >/dev/null; then
 		remove_mark 2>/dev/null
 		kill -9 `pidof clash_core|sed "s/$//g"` 2>/dev/null  # what is the point? double check?
-		echo "Failed to start clash, please check the log" >$REAL_LOG
+		echo "Failed to start clash, please check the log" >> $REAL_LOG
 		exit 1101
     fi
-	echo "Clash Started Successfuly" >$REAL_LOG
+	echo "Clash Started Successfuly" >> $REAL_LOG
 #===========================================================================================================================
 }
 
@@ -696,20 +696,20 @@ stop(){
 
 		sed -i '/#START/,/#END/d' "$LIST" 2>/dev/null
 
-		echo "Stopping client..." >$REAL_LOG
+		echo "Stopping client..." >> $REAL_LOG
 		sleep 1
 		remove_mark >/dev/null 2>&1
 
-		echo "Removing clash iptables rules..." >$REAL_LOG
+		echo "Removing clash iptables rules..." >> $REAL_LOG
 
 		bash /usr/share/clash/backup.sh >/dev/null 2>&1
 
 		kill -9 `pidof clash_core|sed "s/$//g"` 2>/dev/null
-		echo "Clash core stoped successfully" >$REAL_LOG
+		echo "Clash core stoped successfully" >> $REAL_LOG
 
 		rm -rf /www/luci-static/yacd 2>/dev/null
 
-		echo "Deleting cron job..." >$REAL_LOG
+		echo "Deleting cron job..." >> $REAL_LOG
   	  	del_cron >/dev/null 2>&1
 	    sleep 1
 
@@ -718,7 +718,7 @@ stop(){
 		echo "0" > /usr/share/clash/logstatus_check >/dev/null 2>&1
 
 		echo "  $(date "+%Y-%m-%d %H:%M:%S") - CLIENT IS DISABLED " >> /usr/share/clash/clash.txt
-		echo "Client is Disabled " >$REAL_LOG
+		echo "Client is Disabled " >> $REAL_LOG
 
 		if pidof clash_core >/dev/null; then
 			kill $(pidof clash_core) >/dev/null 2>&1 || kill -9 $(ps | grep clash | grep -v grep | awk '{print $1}') >/dev/null 2>&1
