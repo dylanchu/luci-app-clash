@@ -1,8 +1,8 @@
 #!/bin/sh
 
-CORE_CLASH="/tmp/core_clash"
-CORE_CLASH_TUN="/etc/clash/clashtun/clash"
-CORE_CLASH_DTUN="/etc/clash/dtun/clash"
+CORE_CLASH="/tmp/clash_core"
+CORE_CLASH_TUN="/etc/clash/clashtun/clash_core"
+CORE_CLASH_DTUN="/etc/clash/dtun/clash_core"
 
 LOGTIME=$(date "+%Y-%m-%d %H:%M:%S")
 LOG_FILE="/tmp/clash_update.txt"
@@ -167,7 +167,7 @@ update(){
 		  rm -rf /tmp/clash.tar.gz >/dev/null 2>&1
 		  echo "" > /tmp/clash_update.txt >/dev/null 2>&1
 	    fi  
-		if pidof clash >/dev/null; then
+		if pidof clash_core >/dev/null; then
 			if [ $CORETYPE == $CORE ];then
 		   	 /etc/init.d/clash restart >/dev/null	
 			fi	

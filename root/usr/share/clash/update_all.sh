@@ -140,7 +140,7 @@ use=$(uci get clash.config.use_config 2>/dev/null)
 
 if [ "$c_type" -eq 1 ] && [ "$(ls -l $use|awk '{print int($5)}')" -ne 0 ];then 
 
-if pidof clash >/dev/null; then
+if pidof clash_core >/dev/null; then
 		/etc/init.d/clash restart 2>/dev/null
 fi
 fi

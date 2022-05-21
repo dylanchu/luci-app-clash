@@ -85,7 +85,7 @@ btnis.write=function(a,t)
 luci.sys.exec(string.format('uci set clash.config.use_config="/usr/share/clash/config/sub/%s"',e[t].name ))
 luci.sys.exec('uci set clash.config.config_type="1"')
 luci.sys.exec('uci commit clash')
-if luci.sys.call("pidof clash >/dev/null") == 0 then
+if luci.sys.call("pidof clash_core >/dev/null") == 0 then
 	SYS.call("/etc/init.d/clash restart >/dev/null 2>&1 &")
         luci.http.redirect(luci.dispatcher.build_url("admin", "services", "clash"))
 else
@@ -202,7 +202,7 @@ btniss.write=function(x,q)
 luci.sys.exec(string.format('uci set clash.config.use_config="/usr/share/clash/config/upload/%s"',p[q].name ))
 luci.sys.exec('uci set clash.config.config_type="2"')
 luci.sys.exec('uci commit clash')
-if luci.sys.call("pidof clash >/dev/null") == 0 then
+if luci.sys.call("pidof clash_core >/dev/null") == 0 then
 	SYS.call("/etc/init.d/clash restart >/dev/null 2>&1 &")
         luci.http.redirect(luci.dispatcher.build_url("admin", "services", "clash"))
 else
@@ -302,7 +302,7 @@ btnisz.write=function(v,c)
 luci.sys.exec(string.format('uci set clash.config.use_config="/usr/share/clash/config/custom/%s"',k[c].name ))
 luci.sys.exec('uci set clash.config.config_type="3"')
 luci.sys.exec('uci commit clash')
-if luci.sys.call("pidof clash >/dev/null") == 0 then
+if luci.sys.call("pidof clash_core >/dev/null") == 0 then
 	SYS.call("/etc/init.d/clash restart >/dev/null 2>&1 &")
         luci.http.redirect(luci.dispatcher.build_url("admin", "services", "clash"))
 else

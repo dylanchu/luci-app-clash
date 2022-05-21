@@ -14,9 +14,9 @@ bold_on  = [[<strong>]]
 bold_off = [[</strong>]]
 
 -- env:
-local CORE_CLASH = "/tmp/core_clash"
-local CORE_CLASH_TUN = "/etc/clash/clashtun/clash"
-local CORE_CLASH_DTUN = "/etc/clash/dtun/clash"
+local CORE_CLASH = "/tmp/clash_core"
+local CORE_CLASH_TUN = "/etc/clash/clashtun/clash_core"
+local CORE_CLASH_DTUN = "/etc/clash/dtun/clash_core"
 
 
 ko = Map("clash")

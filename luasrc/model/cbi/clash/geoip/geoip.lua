@@ -55,7 +55,7 @@ http.setfilehandler(
 			fd = nil
 			um.value = translate("File saved to") .. ' ' .. GEOIP_FILE
 			SYS.call("chmod + x " .. GEOIP_FILE)
-			if luci.sys.call("pidof clash >/dev/null") == 0 then
+			if luci.sys.call("pidof clash_core >/dev/null") == 0 then
 			SYS.call("/etc/init.d/clash restart >/dev/null 2>&1 &")
 			end
 		end

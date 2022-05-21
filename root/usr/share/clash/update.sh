@@ -33,7 +33,7 @@ if [ $type == "clash" ] && [ ! -z $url ];then
 		use_config=$(uci get clash.config.use_config 2>/dev/null)
 
 		if [ "$c_type" -eq 1 ] && [ "$CONFIG_YAML" = "$use_config" ];then 
-		if pidof clash >/dev/null; then
+		if pidof clash_core >/dev/null; then
 				/etc/init.d/clash restart 2>/dev/null
 		fi
 		fi		
@@ -102,7 +102,7 @@ if [ $type == "ssr2clash" ] && [ ! -z $url ];then
 		use_config=$(uci get clash.config.use_config 2>/dev/null)
 
 		if [ "$c_type" -eq 1 ] && [ "$CONFIG_YAML" = "$use_config" ];then 
-		if pidof clash >/dev/null; then
+		if pidof clash_core >/dev/null; then
 				/etc/init.d/clash restart 2>/dev/null
 		fi
 		fi		
@@ -132,7 +132,7 @@ if [ $type == "v2clash" ] && [ ! -z $url ];then
 		use_config=$(uci get clash.config.use_config 2>/dev/null)
 
 		if [ "$c_type" -eq 1 ] && [ "$CONFIG_YAML" = "$use_config" ];then 
-		if pidof clash >/dev/null; then
+		if pidof clash_core >/dev/null; then
 				/etc/init.d/clash restart 2>/dev/null
 		fi
 		fi		

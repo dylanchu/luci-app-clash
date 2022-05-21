@@ -28,6 +28,6 @@ sleep 2
 rm -rf /var/run/geoip_update >/dev/null 2>&1
 echo "" > /tmp/geoip_update.txt >/dev/null 2>&1
 
-if pidof clash >/dev/null; then
+if pidof clash_core >/dev/null; then
 /etc/init.d/clash restart 2>/dev/null
 fi
