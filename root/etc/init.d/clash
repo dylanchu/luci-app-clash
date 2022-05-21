@@ -88,12 +88,10 @@ if [  -f "$CONFIG_YAML_PATH" ] && [ "$(ls -l "$CONFIG_YAML_PATH"|awk '{print int
 	cp "$CONFIG_YAML_PATH" $CONFIG_YAML 2>/dev/null
 elif [ ! -f "$CONFIG_YAML_PATH" ] && [ ! -f $CONFIG_YAML ];then
 	echo "No config file!" >$REAL_LOG
-	echo "------- fin -------" >$REAL_LOG
-	exit 2
+	exit 2001
 elif [ "$(ls -l "$CONFIG_YAML_PATH"|awk '{print int($5)}')" -eq 0 ] && [ "$(ls -l $CONFIG_YAML|awk '{print int($5)}')" -eq 0 ];then
 	echo "Your config file is EMPTY!" >$REAL_LOG
-	echo "------- fin -------" >$REAL_LOG
-	exit 2
+	exit 2001
 fi
 #===========================================================================================================================
 }
@@ -384,9 +382,8 @@ fi
 
 if [ "${enable}" -ne 1 ]; then
 	echo "  $(date "+%Y-%m-%d %H:%M:%S") - client is NOT enabled, will not start." >>/usr/share/clash/clash.txt
-	echo "Error: client is NOT enabled, will not start." >$REAL_LOG
-	echo "------- fin -------" >$REAL_LOG
-	exit -1
+	echo "Error: Client is NOT enabled, will not start." >$REAL_LOG
+	exit 1000
 fi
 
 echo "Starting client..." >$REAL_LOG
@@ -394,27 +391,23 @@ select_config >/dev/null 2>&1
 sleep 1
 
 if [ "${core}" -eq 1 ] && [ ! -f $CORE_CLASH ]; then
-	echo "  $(date "+%Y-%m-%d %H:%M:%S") - Can NOT find clash core ($CORE_CLASH), plz download and install it from update page" >> /usr/share/clash/clash.txt
-	echo "Can NOT find clash core ($CORE_CLASH), plz download and install it from update page" >> $REAL_LOG
-	echo "------- fin -------" >$REAL_LOG
-	exit 1
+	echo "  $(date "+%Y-%m-%d %H:%M:%S") - Can NOT find clash core ($CORE_CLASH), plz install it from update page" >> /usr/share/clash/clash.txt
+	echo "Can NOT find clash core ($CORE_CLASH), plz install it from update page" >> $REAL_LOG
+	exit 1001
 elif  [ "${core}" -eq 3 ] && [ ! -f $CORE_CLASH_TUN ]; then
 	echo "  $(date "+%Y-%m-%d %H:%M:%S") - Can NOT find Tun core ($CORE_CLASH_TUN)" >> /usr/share/clash/clash.txt
 	echo "Can NOT find Tun core ($CORE_CLASH_TUN)" >> $REAL_LOG
-	echo "------- fin -------" >$REAL_LOG
-	exit 1
+	exit 1003
 elif  [ "${core}" -eq 4 ] && [ ! -f $CORE_CLASH_DTUN ]; then
 	echo "  $(date "+%Y-%m-%d %H:%M:%S") - Can NOT find Tun core ($CORE_CLASH_DTUN)" >> /usr/share/clash/clash.txt
 	echo "Can NOT find Tun core ($CORE_CLASH_DTUN)" >> $REAL_LOG
-	echo "------- fin -------" >$REAL_LOG
-	exit 1
+	exit 1004
 fi
 
 if  [ ! -f $CONFIG_YAML ] || [ "$(ls -l $CONFIG_YAML|awk '{print int($5)}')" -eq 0 ] ; then
 	echo "  $(date "+%Y-%m-%d %H:%M:%S") - Invalid config.yaml, empty or not found" >> /usr/share/clash/clash.txt
 	echo "  Error: invalid config.yaml, empty or not found" >$REAL_LOG
-	echo "------- fin -------" >$REAL_LOG
-	exit 2
+	exit 2001
 fi
 
 	# ------ Config ------
@@ -422,19 +415,17 @@ fi
 	custom_list >/dev/null 2>&1
 	if [ "$core" -eq 4 ] || [ "$core" -eq 3 ];then
 		if [ $tun_mode -eq 0 ];then
-			uci set clash.config.tun_mode="1" && uci set clash.config.stack="system" && uci commit clash
 			echo "Enabling TUN..." >$REAL_LOG
+			uci set clash.config.tun_mode="1" && uci set clash.config.stack="system" && uci commit clash
 		fi
 	fi
-
-	sleep 1
 
 	enable_dns=$(uci get clash.config.enable_dns 2>/dev/null)
 
 	if [ -z "$(grep "^ {0,}listen:" $CONFIG_YAML)" ] || [ -z "$(grep "^ {0,}enhanced-mode:" $CONFIG_YAML)" ] || [ -z "$(grep "^ {0,}dns:" $CONFIG_YAML)" ];then
 		if [ $enable_dns -eq 0 ];then
 			uci set clash.config.enable_dns="1" && uci commit clash
-			echo "Enabling Custom Dns..." >$REAL_LOG
+			echo "Enabling custom DNS..." >$REAL_LOG
 		fi
 	fi
 
@@ -443,11 +434,10 @@ fi
 			uci set clash.config.core="4" && uci commit clash
 			sleep 1
 		else
-			echo "Error: your current config only support DTUN core" >$REAL_LOG
+			echo "Error: Your current config only support DTUN core" >$REAL_LOG
 			remove_mark >/dev/null 2>&1
 			sleep 1
-			echo "------- fin -------" >$REAL_LOG
-			exit 0
+			exit 2004
 		fi
 	fi
 
@@ -457,11 +447,9 @@ fi
 			uci set clash.config.core="4" && uci commit clash
 			sleep 1
 		else
-			echo "Error: your current config only support DTUN core" >$REAL_LOG
+			echo "Error: Your current config only support DTUN core" >$REAL_LOG
 			remove_mark >/dev/null 2>&1
-			sleep 1
-			echo "------- fin -------" >$REAL_LOG
-			exit 2
+			exit 2004
 		fi
 	fi
 	if [ ! -z "$tmp_rule" ] && [ "$(uci get clash.config.p_mode 2>/dev/null)" != "Script" ];then
@@ -471,21 +459,18 @@ fi
 	fi
 	unset tmp_rule
 
-	sleep 1
    	yml_change >/dev/null 2>&1
 
 
 	if [ ! -f $GEOIP_FILE ];then
-		echo "Error: can NOT find Country.mmdb" >$REAL_LOG
-		echo "------- fin -------" >$REAL_LOG
-		exit 3
+		echo "Error: Can NOT find Country.mmdb" >$REAL_LOG
+		exit 3001
 	fi
 
 	if [ ! -f $CONFIG_YAML ];then
-		echo "Error: can NOT find config.yaml" >$REAL_LOG
+		echo "Error: Can NOT find config.yaml" >$REAL_LOG
 		remove_mark >/dev/null 2>&1
-		echo "------- fin -------" >$REAL_LOG
-		exit 2
+		exit 2001
 	fi
 
 	yml_dns_change >/dev/null 2>&1
@@ -520,16 +505,15 @@ fi
 	echo "Setting up cron jobs..." >$REAL_LOG
 	add_cron
 
-	echo "Clash Started!" >$REAL_LOG
-
 	sleep 1
 	echo "Check if clash is running..." >$REAL_LOG
 	if ! pidof clash_core >/dev/null; then
-      		remove_mark 2>/dev/null
-      		kill -9 `pidof clash_core|sed "s/$//g"` 2>/dev/null  # what is the point? double check?
-	  	sleep 1
-	  	echo "------- fin -------" >$REAL_LOG
+		remove_mark 2>/dev/null
+		kill -9 `pidof clash_core|sed "s/$//g"` 2>/dev/null  # what is the point? double check?
+		echo "Failed to start clash, please check the log" >$REAL_LOG
+		exit 1101
     fi
+	echo "Clash Started Successfuly" >$REAL_LOG
 #===========================================================================================================================
 }
 
@@ -735,13 +719,10 @@ stop(){
 
 		echo "  $(date "+%Y-%m-%d %H:%M:%S") - CLIENT IS DISABLED " >> /usr/share/clash/clash.txt
 		echo "Client is Disabled " >$REAL_LOG
-		sleep 1
-		echo "------- fin -------" >$REAL_LOG
 
 		if pidof clash_core >/dev/null; then
 			kill $(pidof clash_core) >/dev/null 2>&1 || kill -9 $(ps | grep clash | grep -v grep | awk '{print $1}') >/dev/null 2>&1
 		fi
-
 
 #===========================================================================================================================
 }
@@ -750,11 +731,10 @@ restart(){
 #===========================================================================================================================
 		if pidof clash_core >/dev/null; then
 			stop  >/dev/null 2>&1
+			sleep 1
 			start >/dev/null 2>&1
-			echo "Clash Successfully Restarted"
 		else
 		    start >/dev/null 2>&1
-			echo "Clash Successfully Started"
 		fi
 #===========================================================================================================================
 }

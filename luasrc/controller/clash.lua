@@ -52,10 +52,10 @@ function index()
 	entry({"admin", "services", "clash", "log"},cbi("clash/logs/log"),_("Log"), 50).leaf = true
 	
 
-	entry({"admin","services","clash","check_status"},call("check_status")).leaf=true
+	entry({"admin", "services", "clash", "check_status"},call("check_status")).leaf=true
 	entry({"admin", "services", "clash", "ping"}, call("act_ping")).leaf=true
 	entry({"admin", "services", "clash", "readlog"},call("action_read")).leaf=true
-	entry({"admin","services","clash", "status"},call("action_status")).leaf=true
+	entry({"admin", "services", "clash", "status"},call("action_status")).leaf=true
 	entry({"admin", "services", "clash", "check"}, call("check_update_log")).leaf=true
 	entry({"admin", "services", "clash", "doupdate"}, call("do_update")).leaf=true
 	entry({"admin", "services", "clash", "start"}, call("do_start")).leaf=true

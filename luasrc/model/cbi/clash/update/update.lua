@@ -26,11 +26,13 @@ sul =ko:section(TypedSection, "clash",translate("Manual Upload"))
 sul.anonymous = true
 sul.addremove=false
 o = sul:option(FileUpload, "")
-o.description =''..font_red..bold_on..translate("Manually download, unzip and rename clash core from links below and upload")..bold_off..font_off..' '
+o.description =''..bold_on..translate("Manually download clash core from links below then unzip and upload")..bold_off..' '
 .."<br />"
 ..translatef("<a href=\"%s\" target=\"_blank\">" .. "Dreamacro clash core - clash</a>", translate("https://github.com/Dreamacro/clash/releases/latest"))
 .."<br />"
 ..translatef("<a href=\"%s\" target=\"_blank\">" .. "Frainzy1477 clashr core - clash</a>", translate("https://github.com/frainzy1477/clash_dev/releases/latest"))
+.."<br />"
+..translatef("<a href=\"%s\" target=\"_blank\">" .. "Vernesong clash core - clash(premium)</a>", translate("https://github.com/vernesong/OpenClash/releases/tag/Clash"))
 .."<br />"
 ..translatef("<a href=\"%s\" target=\"_blank\">" .. "comzyh clash tun core - clash(ctun)</a>", translate("https://github.com/comzyh/clash/releases/latest"))
 .."<br />"
