@@ -3,40 +3,27 @@ local SYS  = require "luci.sys"
 local HTTP = require "luci.http"
 local DISP = require "luci.dispatcher"
 local UTIL = require "luci.util"
-local uci = require("luci.model.uci").cursor()
-local m , r, k
+local uci  = require("luci.model.uci").cursor()
 local http = luci.http
-
-font_red = [[<font color="red">]]
-font_green = [[<font color="green">]]
-font_off = [[</font>]]
-bold_on  = [[<strong>]]
-bold_off = [[</strong>]]
+local m, r, k
 
 -- env:
-local CORE_CLASH = "/tmp/clash_core"
-local CORE_CLASH_TUN = "/etc/clash/clashtun/clash_core"
-local CORE_CLASH_DTUN = "/etc/clash/dtun/clash_core"
+dofile "/usr/share/clash/init_env_conf.lua"
 
 
 ko = Map("clash")
 ko.reset = false
 ko.submit = false
-sul =ko:section(TypedSection, "clash",translate("Manual Upload"))
+sul = ko:section(TypedSection, "clash", translate("Manual Upload"))
 sul.anonymous = true
-sul.addremove=false
+sul.addremove = false
 o = sul:option(FileUpload, "")
-o.description =''..bold_on..translate("Manually download clash core from links below then unzip and upload")..bold_off..' '
-.."<br />"
-..translatef("<a href=\"%s\" target=\"_blank\">" .. "Dreamacro clash core - clash</a>", translate("https://github.com/Dreamacro/clash/releases/latest"))
-.."<br />"
-..translatef("<a href=\"%s\" target=\"_blank\">" .. "Frainzy1477 clashr core - clash</a>", translate("https://github.com/frainzy1477/clash_dev/releases/latest"))
-.."<br />"
-..translatef("<a href=\"%s\" target=\"_blank\">" .. "Vernesong clash core - clash(premium)</a>", translate("https://github.com/vernesong/OpenClash/releases/tag/Clash"))
-.."<br />"
-..translatef("<a href=\"%s\" target=\"_blank\">" .. "comzyh clash tun core - clash(ctun)</a>", translate("https://github.com/comzyh/clash/releases/latest"))
-.."<br />"
-..translatef("<a href=\"%s\" target=\"_blank\">" .. "Dreamacro clash tun core - clash(premium)</a>", translate("https://github.com/Dreamacro/clash/releases/tag/premium"))
+
+local tmp_str = '' .. bold_on .. translate("Manually download clash core from links below then unzip and upload") .. bold_off .. ' '
+for idx, v in ipairs(CORE_NAMES) do
+	tmp_str = tmp_str .. "<br />" .. translatef("<a href=\"%s\" target=\"_blank\">%s</a>", translate(CORE_DOWNLOAD_URLS[idx]), v)
+end
+o.description = tmp_str
 
 
 o.title = translate("  ")
@@ -44,20 +31,20 @@ o.template = "clash/upload_core"
 um = sul:option(DummyValue, "", nil)
 um.template = "clash/clash_dvalue"
 
-local fd,cssr
+local fd, cssr
 
 http.setfilehandler(
 	function(meta, chunk, eof)
 		local fp = HTTP.formvalue("file_type")
 		if not fd then
 			if not meta then return end
-			
+
 			if fp == "clash" then
-			   if meta and chunk then fd = nixio.open(CORE_CLASH, "w") end
+				if meta and chunk then fd = nixio.open(CORE_CLASH, "w") end
 			elseif fp == "clashctun" then
-			   if meta and chunk then fd = nixio.open(CORE_CLASH_TUN, "w") end
+				if meta and chunk then fd = nixio.open(CORE_CLASH_TUN, "w") end
 			elseif fp == "clashdtun" then
-			   if meta and chunk then fd = nixio.open(CORE_CLASH_DTUN, "w") end  
+				if meta and chunk then fd = nixio.open(CORE_CLASH_DTUN, "w") end
 			end
 
 			if not fd then
@@ -71,7 +58,7 @@ http.setfilehandler(
 		if eof and fd then
 			fd:close()
 			fd = nil
-			
+
 			local chmod_tpl = "chmod 755 %s 2>&1 &"
 			local version_tpl = "rm -rf %s 2>/dev/null && %s -v | awk -F ' ' '{print $2}' >> %s 2>/dev/null"
 			local l_str_saved = translate("File saved to")
@@ -91,8 +78,7 @@ http.setfilehandler(
 				SYS.exec(string.format(version_tpl, tmp, CORE_CLASH_DTUN, tmp))
 				um.value = l_str_saved .. ': ' .. CORE_CLASH_DTUN
 			end
-			
-			
+
 		end
 	end
 )
@@ -105,13 +91,12 @@ if luci.http.formvalue("upload") then
 end
 
 
-
 m = Map("clash")
-m:section(SimpleSection).template  = "clash/update"
+m:section(SimpleSection).template = "clash/update"
 m.pageaction = false
 
 k = Map("clash")
-s = k:section(TypedSection, "clash",translate("Download Online"))
+s = k:section(TypedSection, "clash", translate("Download Online"))
 s.anonymous = true
 o = s:option(ListValue, "dcore", translate("Core Type"))
 o.default = "clashcore"
@@ -120,10 +105,9 @@ o:value("3", translate("clash(ctun)"))
 o:value("4", translate("clash(premium)"))
 
 
-
-local cpu_model=SYS.exec("opkg status libc 2>/dev/null |grep 'Architecture' |awk -F ': ' '{print $2}' 2>/dev/null")
+local cpu_model = SYS.exec("opkg status libc 2>/dev/null |grep 'Architecture' |awk -F ': ' '{print $2}' 2>/dev/null")
 o = s:option(ListValue, "download_core", translate("Select Core"))
-o.description = translate("CPU Model")..': '..font_green..bold_on..cpu_model..bold_off..font_off..' '
+o.description = translate("CPU Model") .. ': ' .. font_green .. bold_on .. cpu_model .. bold_off .. font_off .. ' '
 o:value("linux-386")
 o:value("linux-amd64", translate("linux-amd64(x86-64)"))
 o:value("linux-armv5")
@@ -138,19 +122,17 @@ o:value("linux-mipsle-softfloat")
 o:value("linux-mipsle-hardfloat")
 
 
-o=s:option(Button,"down_core")
+o = s:option(Button, "down_core")
 o.inputtitle = translate("Save & Apply")
 o.title = luci.util.pcdata(translate("Save & Apply"))
 o.inputstyle = "reload"
 o.write = function()
-  k.uci:commit("clash")
+	k.uci:commit("clash")
 end
 
-o = s:option(Button,"download")
+o = s:option(Button, "download")
 o.title = translate("Download")
 o.template = "clash/core_check"
 
 
-return m, ko,k
-
-
+return m, ko, k

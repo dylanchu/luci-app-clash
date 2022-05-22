@@ -3,10 +3,7 @@ local fs=require"nixio.fs"
 local http=require"luci.http"
 local uci=require"luci.model.uci".cursor()
 
-local CORE_CLASH = "/tmp/clash_core"
-local CORE_CLASH_TUN = "/etc/clash/clashtun/clash_core"
-local CORE_CLASH_DTUN = "/etc/clash/dtun/clash_core"
-local GEOIP_FILE = "/etc/clash/Country.mmdb"
+dofile "/usr/share/clash/init_env_conf.lua"
 
 
 function index()

@@ -9,11 +9,7 @@ local UTIL = require "luci.util"
 local fs = require "luci.clash"
 local uci = require "luci.model.uci".cursor()
 
-font_red = [[<font color="red">]]
-font_blue = [[<font color="blue">]]
-font_off = [[</font>]]
-bold_on  = [[<strong>]]
-bold_off = [[</strong>]]
+dofile "/usr/share/clash/init_env_conf.lua"
 
 
 m = Map(clash)

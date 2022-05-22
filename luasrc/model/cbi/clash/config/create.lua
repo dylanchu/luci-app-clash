@@ -9,10 +9,8 @@ local uci = require "luci.model.uci".cursor()
 local s, o, krk, z, r
 local http = luci.http
 
-font_blue = [[<font color="blue">]]
-font_off = [[</font>]]
-bold_on  = [[<strong>]]
-bold_off = [[</strong>]]
+dofile "/usr/share/clash/init_env_conf.lua"
+
 
 krk = Map(clash)
 s = krk:section(TypedSection, "clash", translate("Create Config"))

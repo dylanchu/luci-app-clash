@@ -1,33 +1,27 @@
-
-local NXFS = require "nixio.fs"
-local SYS  = require "luci.sys"
-local HTTP = require "luci.http"
-local DISP = require "luci.dispatcher"
-local UTIL = require "luci.util"
-local uci = require("luci.model.uci").cursor()
+local NXFS  = require "nixio.fs"
+local SYS   = require "luci.sys"
+local HTTP  = require "luci.http"
+local DISP  = require "luci.dispatcher"
+local UTIL  = require "luci.util"
+local uci   = require("luci.model.uci").cursor()
 local clash = "clash"
-local http = luci.http
+local http  = luci.http
 
-font_red = [[<font color="red">]]
-font_off = [[</font>]]
-bold_on  = [[<strong>]]
-bold_off = [[</strong>]]
-
-local GEOIP_FILE = "/etc/clash/Country.mmdb"
+dofile "/usr/share/clash/init_env_conf.lua"
 
 
 k = Map(clash)
 k.reset = false
 k.submit = false
-s=k:section(TypedSection, "clash", translate("Local Update GeoIP"))
+s = k:section(TypedSection, "clash", translate("Local Update GeoIP"))
 s.anonymous = true
-s.addremove=false
+s.addremove = false
 o = s:option(FileUpload, "")
 o.description = translate("NB: Upload GEOIP Database file Country.mmdb")
-.."<br />"
-..translate("https://github.com/Dreamacro/maxmind-geoip/releases")
-.."<br />"
-..translate("https://raw.githubusercontent.com/alecthw/mmdb_china_ip_list/release/Country.mmdb")
+	.. "<br />"
+	.. translate(GEOIP_GH_REPO_RELEASE_URL)
+	.. "<br />"
+	.. translate(GEOIP_DOWNLOAD_URL)
 
 o.title = translate("  ")
 o.template = "clash/clash_upload"
@@ -40,7 +34,7 @@ http.setfilehandler(
 		if not fd then
 			if not meta then return end
 
-			if	meta and chunk then fd = nixio.open(GEOIP_FILE, "w") end
+			if meta and chunk then fd = nixio.open(GEOIP_FILE, "w") end
 
 			if not fd then
 				um.value = translate("upload file error.")
@@ -56,7 +50,7 @@ http.setfilehandler(
 			um.value = translate("File saved to") .. ' ' .. GEOIP_FILE
 			SYS.call("chmod + x " .. GEOIP_FILE)
 			if luci.sys.call("pidof clash_core >/dev/null") == 0 then
-			SYS.call("/etc/init.d/clash restart >/dev/null 2>&1 &")
+				SYS.call("/etc/init.d/clash restart >/dev/null 2>&1 &")
 			end
 		end
 	end
@@ -73,19 +67,19 @@ end
 
 
 m = Map("clash")
-s = m:section(TypedSection, "clash" , translate("Online Update GeoIP"))
+s = m:section(TypedSection, "clash", translate("Online Update GeoIP"))
 m.pageaction = false
 s.anonymous = true
-s.addremove=false
+s.addremove = false
 
 o = s:option(Flag, "auto_update_geoip", translate("Auto Update"))
 o.description = translate("Auto Update GeoIP Database")
 
 o = s:option(ListValue, "auto_update_geoip_time", translate("Update time (every day)"))
-for t = 0,23 do
-o:value(t, t..":00")
+for t = 0, 23 do
+	o:value(t, t .. ":00")
 end
-o.default=0
+o.default = 0
 o.description = translate("GeoIP Update Time")
 
 
@@ -105,7 +99,7 @@ o:value("6", translate("Every Saturday"))
 o:value("0", translate("Every Sunday"))
 local update_time_tpl = "ls -l --full-time %s|awk '{print $6,$7;}'"
 update_time = SYS.exec(string.format(update_time_tpl, GEOIP_FILE))
-local desc = translate("Update Time")..'- ' ..font_red..bold_on..update_time..bold_off..font_off..' '
+local desc = translate("Update Time") .. '- ' .. font_red .. bold_on .. update_time .. bold_off .. font_off .. ' '
 o.description = desc
 o:depends("up_time", "weekly")
 
@@ -124,22 +118,21 @@ o:value("2", translate("Github"))
 
 o = s:option(Value, "license_key")
 o.title = translate("License Key")
-o.description = translate("MaxMind License Key")..translate(" https://www.maxmind.com/en/geolite2/signup")
+o.description = translate("MaxMind License Key") .. translate(" https://www.maxmind.com/en/geolite2/signup")
 o.rmempty = true
 o:depends("geoip_source", "1")
 
-o=s:option(Button,"update_geoip")
+o = s:option(Button, "update_geoip")
 o.inputtitle = translate("Save & Apply")
 o.title = luci.util.pcdata(translate("Save & Apply"))
 o.inputstyle = "reload"
 o.write = function()
-  m.uci:commit("clash")
+	m.uci:commit("clash")
 end
 
-o = s:option(Button,"download")
+o = s:option(Button, "download")
 o.title = translate("Download")
 o.template = "clash/geoip"
 
 
 return m, k
-
