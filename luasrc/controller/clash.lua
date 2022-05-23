@@ -251,7 +251,7 @@ local function downcheck()
 		return "0"
 	elseif nixio.fs.access("/var/run/core_update") then
 		return "1"
-	elseif nixio.fs.access("/usr/share/clash/core_down_complete") then
+	elseif nixio.fs.access(CORE_DOWNLOADED_FLAG) then
 		return "2"
 	end
 end

@@ -19,7 +19,6 @@ log_real_msg() {
 	echo "$1" >>"$REAL_LOG"
 }
 
-
 revert_dns() {
 	#===========================================================================================================================
 	dns_port=$(grep "^ \{0,\}listen:" "$RUNTIME_YAML" | awk -F ':' '{print $3}' 2>/dev/null)
@@ -79,9 +78,9 @@ del_cron() {
 	#===========================================================================================================================
 	sed -i '/clash-watchdog.sh/d' $CRON_FILE
 	name="/usr/share/clash/update_all.sh"
-	escaped_fn=$(echo "$name"|sed 's/\//\\\//g')
+	escaped_fn=$(echo "$name" | sed 's/\//\\\//g')
 	sed -i "/$escaped_fn/d" $CRON_FILE
-	escaped_fn=$(echo "$LOG_FILE"|sed 's/\//\\\//g')
+	escaped_fn=$(echo "$LOG_FILE" | sed 's/\//\\\//g')
 	sed -i "/$escaped_fn/d" $CRON_FILE
 	/etc/init.d/cron restart
 	#===========================================================================================================================
@@ -388,9 +387,13 @@ start() {
 	sleep 1
 
 	if [ "${core}" -eq 1 ] && [ ! -f "$CORE_CLASH" ]; then
-		echo "  $(date "+%Y-%m-%d %H:%M:%S") - Can NOT find clash core ($CORE_CLASH), plz install it from update page" >>"$LOG_FILE"
-		log_real_msg "Can NOT find clash core ($CORE_CLASH), plz install it from update page"
-		exit 11
+		echo "  $(date "+%Y-%m-%d %H:%M:%S") - Clash core ($CORE_CLASH) not found, trying to download it..." >>"$LOG_FILE"
+		log_real_msg "Clash core not found, trying to download ($CORE_CLASH)..."
+		sh /usr/share/clash/core_download.sh "download" >/tmp/clash_update.txt 2>&1
+		if [ "${core}" -eq 1 ] && [ ! -f "$CORE_CLASH" ]; then
+			echo "  $(date "+%Y-%m-%d %H:%M:%S") - Can NOT find clash core ($CORE_CLASH), please install it from update page" >>"$LOG_FILE"
+			exit 11
+		fi
 	elif [ "${core}" -eq 3 ] && [ ! -f "$CORE_CLASH_TUN" ]; then
 		echo "  $(date "+%Y-%m-%d %H:%M:%S") - Can NOT find Tun core ($CORE_CLASH_TUN)" >>"$LOG_FILE"
 		log_real_msg "Can NOT find Tun core ($CORE_CLASH_TUN)"

@@ -9,6 +9,11 @@
 CORE_CLASH="/tmp/clash_core"
 CORE_CLASH_TUN="/etc/clash/clashtun/clash_core"
 CORE_CLASH_DTUN="/etc/clash/dtun/clash_core"
+CORE_NAME_IN_TAR="clash_core"
+
+CORE_DOWNLOADED_FLAG="/tmp/clash_flag_core_down_complete"
+
+# geoip
 GEOIP_FILE="/etc/clash/Country.mmdb"
 
 # log

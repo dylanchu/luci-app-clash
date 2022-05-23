@@ -3,139 +3,169 @@
 # shellcheck source=/dev/null
 . /usr/share/clash/init_env_conf.sh
 
-LOGTIME=$(date "+%Y-%m-%d %H:%M:%S")
-LOG_FILE="/tmp/clash_update.txt"
-MODELTYPE=$(uci get clash.config.download_core 2>/dev/null)
-CORETYPE=$(uci get clash.config.dcore 2>/dev/null)
-CORE=$(uci get clash.config.core 2>/dev/null)
-# lang=$(uci get luci.main.lang 2>/dev/null)
+UPDATE_LOG_FILE="/tmp/clash_update.txt"
+download_core_type=$(uci get clash.config.dcore 2>/dev/null)
+tmp_core_file="/tmp/clash-core-tmp.tar"
 
-if [ -f /tmp/clash.tar.gz ]; then
-	rm -rf /tmp/clash.tar.gz >/dev/null 2>&1
-fi
-echo '' >/tmp/clash_update.txt 2>/dev/null
+get_log_time() {
+	date "+%Y-%m-%d %H:%M:%S"
+}
 
-if [ -f /usr/share/clash/core_down_complete ]; then
-	rm -rf /usr/share/clash/core_down_complete 2>/dev/null
-fi
-
-echo "  ${LOGTIME} - Checking latest version.." >$LOG_FILE
-# shellcheck disable=SC2086
-if [ $CORETYPE -eq 4 ]; then
-	if [ -f /usr/share/clash/download_dtun_version ]; then
-		rm -rf /usr/share/clash/download_dtun_version
+prepare_for_update() {
+	#=============================================================================================
+	if [ -f $tmp_core_file ]; then
+		rm -rf $tmp_core_file >/dev/null 2>&1
 	fi
-	new_clashdtun_core_version=$(wget -qO- "$URL_GITHUB_CORE_DTUN_TAGS" | grep "/frainzy1477/clashdtun/releases/" | head -n 1 | awk -F "/tag/" '{print $2}' | sed 's/\">//')
+	echo '' >$UPDATE_LOG_FILE 2>/dev/null
 
-	if [ $new_clashdtun_core_version ]; then
-		echo $new_clashdtun_core_version >/usr/share/clash/download_dtun_version 2>&1
-	elif [ $new_clashdtun_core_version = "" ]; then
-		echo 0 >/usr/share/clash/download_dtun_version 2>&1
+	if [ -f "$CORE_DOWNLOADED_FLAG" ]; then
+		rm -rf "$CORE_DOWNLOADED_FLAG" 2>/dev/null
 	fi
-	sleep 5
-	if [ -f /usr/share/clash/download_dtun_version ]; then
-		CLASHDTUNC=$(sed -n 1p /usr/share/clash/download_dtun_version 2>/dev/null)
-	fi
-fi
+	#=============================================================================================
+}
 
 # shellcheck disable=SC2086
-if [ $CORETYPE -eq 3 ]; then
-	if [ -f /usr/share/clash/download_tun_version ]; then
-		rm -rf /usr/share/clash/download_tun_version
-	fi
-	new_clashtun_core_version=$(wget -qO- "https://github.com/frainzy1477/clashtun/tags" | grep "/frainzy1477/clashtun/releases/" | head -n 1 | awk -F "/tag/" '{print $2}' | sed 's/\">//')
+check_latest_version() {
+	#=============================================================================================
+	echo "  $(get_log_time) - Checking latest version.." >$UPDATE_LOG_FILE
+	if [ $download_core_type -eq 4 ]; then
 
-	if [ $new_clashtun_core_version ]; then
-		echo $new_clashtun_core_version >/usr/share/clash/download_tun_version 2>&1
-	elif [ $new_clashtun_core_version = "" ]; then
-		echo 0 >/usr/share/clash/download_tun_version 2>&1
-	fi
-	sleep 5
-	if [ -f /usr/share/clash/download_tun_version ]; then
-		CLASHTUN=$(sed -n 1p /usr/share/clash/download_tun_version 2>/dev/null)
-	fi
-fi
+		if [ -f /usr/share/clash/download_dtun_version ]; then
+			rm -rf /usr/share/clash/download_dtun_version
+		fi
+		new_clashdtun_core_version=$(wget -qO- "$URL_GITHUB_CORE_DTUN_TAGS" | grep "/frainzy1477/clashdtun/releases/" | head -n 1 | awk -F "/tag/" '{print $2}' | sed 's/\">//')
 
-# shellcheck disable=SC2086
-if [ $CORETYPE -eq 1 ]; then
-	if [ -f /usr/share/clash/download_core_version ]; then
-		rm -rf /usr/share/clash/download_core_version
-	fi
-	new_clashr_core_version=$(wget -qO- "https://github.com/frainzy1477/clash_dev/tags" | grep "/frainzy1477/clash_dev/releases/" | head -n 1 | awk -F "/tag/" '{print $2}' | sed 's/\">//')
+		if [ $new_clashdtun_core_version ]; then
+			echo $new_clashdtun_core_version >/usr/share/clash/download_dtun_version 2>&1
+		elif [ $new_clashdtun_core_version = "" ]; then
+			echo 0 >/usr/share/clash/download_dtun_version 2>&1
+		fi
+		sleep 1
+		if [ -f /usr/share/clash/download_dtun_version ]; then
+			CLASHDTUNC=$(sed -n 1p /usr/share/clash/download_dtun_version 2>/dev/null)
+		fi
 
-	if [ $new_clashr_core_version ]; then
-		echo $new_clashr_core_version >/usr/share/clash/download_core_version 2>&1
-	elif [ $new_clashr_core_version = "" ]; then
-		echo 0 >/usr/share/clash/download_core_version 2>&1
-	fi
-	sleep 5
-	if [ -f /usr/share/clash/download_core_version ]; then
-		CLASHVER=$(sed -n 1p /usr/share/clash/download_core_version 2>/dev/null)
-	fi
-fi
+	elif [ $download_core_type -eq 3 ]; then
 
-sleep 2
+		if [ -f /usr/share/clash/download_tun_version ]; then
+			rm -rf /usr/share/clash/download_tun_version
+		fi
+		new_clashtun_core_version=$(wget -qO- "https://github.com/frainzy1477/clashtun/tags" | grep "/frainzy1477/clashtun/releases/" | head -n 1 | awk -F "/tag/" '{print $2}' | sed 's/\">//')
 
-# shellcheck disable=SC2086
+		if [ $new_clashtun_core_version ]; then
+			echo $new_clashtun_core_version >/usr/share/clash/download_tun_version 2>&1
+		elif [ $new_clashtun_core_version = "" ]; then
+			echo 0 >/usr/share/clash/download_tun_version 2>&1
+		fi
+		sleep 1
+		if [ -f /usr/share/clash/download_tun_version ]; then
+			CLASHTUN=$(sed -n 1p /usr/share/clash/download_tun_version 2>/dev/null)
+		fi
+
+	elif [ $download_core_type -eq 1 ]; then
+
+		if [ -f /usr/share/clash/download_core_version ]; then
+			rm -rf /usr/share/clash/download_core_version
+		fi
+		new_clashr_core_version=$(wget -qO- "https://github.com/frainzy1477/clash_dev/tags" | grep "/frainzy1477/clash_dev/releases/" | head -n 1 | awk -F "/tag/" '{print $2}' | sed 's/\">//')
+
+		if [ $new_clashr_core_version ]; then
+			echo $new_clashr_core_version >/usr/share/clash/download_core_version 2>&1
+		elif [ $new_clashr_core_version = "" ]; then
+			echo 0 >/usr/share/clash/download_core_version 2>&1
+		fi
+		sleep 1
+		if [ -f /usr/share/clash/download_core_version ]; then
+			CLASHVER=$(sed -n 1p /usr/share/clash/download_core_version 2>/dev/null)
+		fi
+
+	fi
+	#=============================================================================================
+}
+
+# shellcheck disable=SC2164
 update() {
+	#=============================================================================================
+	tmp_model_type=$(uci get clash.config.download_core 2>/dev/null)
 	if [ -f /tmp/clash.gz ]; then
 		rm -rf /tmp/clash.gz >/dev/null 2>&1
 	fi
-	echo "  ${LOGTIME} - Starting clash core download..." >>$LOG_FILE
-	if [ $CORETYPE -eq 1 ]; then
-		wget --no-check-certificate https://github.com/frainzy1477/clash_dev/releases/download/"$CLASHVER"/clash-"$MODELTYPE".gz -O /tmp/clash.gz 2>&1
-	elif [ $CORETYPE -eq 3 ]; then
-		wget --no-check-certificate https://github.com/frainzy1477/clashtun/releases/download/"$CLASHTUN"/clash-"$MODELTYPE".gz -O /tmp/clash.gz 2>&1
-	elif [ $CORETYPE -eq 4 ]; then
-		wget --no-check-certificate https://github.com/frainzy1477/clashdtun/releases/download/"$CLASHDTUNC"/clash-"$MODELTYPE".gz -O /tmp/clash.gz 2>&1
+
+	echo "  $(get_log_time) - Starting clash core download..." >>$UPDATE_LOG_FILE
+
+	if [ "$download_core_type" -eq 1 ]; then
+		wget --no-check-certificate https://files.cnblogs.com/files/dylanchu/clash-core-softfloat.tar?t=1653323230 -O $tmp_core_file 2>&1
+	elif [ "$download_core_type" -eq 3 ]; then
+		wget --no-check-certificate https://github.com/frainzy1477/clashtun/releases/download/"$CLASHTUN"/clash-"$tmp_model_type".gz -O $tmp_core_file 2>&1
+	elif [ "$download_core_type" -eq 4 ]; then
+		wget --no-check-certificate https://github.com/frainzy1477/clashdtun/releases/download/"$CLASHDTUNC"/clash-"$tmp_model_type".gz -O $tmp_core_file 2>&1
 	fi
-
-	if [ "$?" -eq "0" ] && [ "$(ls -l /tmp/clash.gz | awk '{print int($5)}')" -ne 0 ]; then
-		echo "  ${LOGTIME} - Unzipping core file..." >>$LOG_FILE
-		gunzip /tmp/clash.gz >/dev/null 2>&1 &&
-			rm -rf /tmp/clash.gz >/dev/null 2>&1 &&
-			chmod 755 /tmp/clash &&
-			chown root:root /tmp/clash
-
-		echo "  ${LOGTIME} - Updating core now..." >>$LOG_FILE
-
-		if [ $CORETYPE -eq 1 ]; then
-			rm -rf ${CORE_CLASH} >/dev/null 2>&1
-			mv /tmp/clash ${CORE_CLASH} >/dev/null 2>&1
-			rm -rf /usr/share/clash/core_version >/dev/null 2>&1
-			mv /usr/share/clash/download_core_version /usr/share/clash/core_version >/dev/null 2>&1
-			echo "  ${LOGTIME} - Clash core updated successfully" >>$LOG_FILE
-
-		elif [ $CORETYPE -eq 3 ]; then
-			rm -rf ${CORE_CLASH_TUN} >/dev/null 2>&1
-			mv /tmp/clash ${CORE_CLASH_TUN} >/dev/null 2>&1
-			rm -rf /usr/share/clash/tun_version >/dev/null 2>&1
-			mv /usr/share/clash/download_tun_version /usr/share/clash/tun_version >/dev/null 2>&1
-			tun=$(sed -n 1p /usr/share/clash/tun_version 2>/dev/null)
-			sed -i "s/${tun}/v${tun}/g" /usr/share/clash/tun_version 2>&1
-			echo "  ${LOGTIME} - Clash core updated successfully" >>$LOG_FILE
-
+	if [ "$?" -ne 0 ] || [ ! -s $tmp_core_file ]; then
+		echo "  $(get_log_time) - Failed to download core file" >>$UPDATE_LOG_FILE
+		rm -f $tmp_core_file >/dev/null 2>&1
+		exit 1
+	else
+		echo "  $(get_log_time) - Trying to extract core file..." >>$UPDATE_LOG_FILE
+		cd /tmp
+		if tar -xf $tmp_core_file; then
+			rm -f $tmp_core_file >/dev/null 2>&1
+			chmod 755 "$CORE_NAME_IN_TAR" && chown root:root "$CORE_NAME_IN_TAR"
+			echo "  $(get_log_time) - Core file extracted." >>$UPDATE_LOG_FILE
+		else
+			rm -f $tmp_core_file >/dev/null 2>&1
+			echo "  $(get_log_time) - Failed to extract file." >>$UPDATE_LOG_FILE
+			exit 1
 		fi
 
-		sleep 2
-		touch /usr/share/clash/core_down_complete >/dev/null 2>&1
-		sleep 2
-		rm -rf /var/run/core_update >/dev/null 2>&1
-		echo "" >/tmp/clash_update.txt >/dev/null 2>&1
+		echo "  $(get_log_time) - Updating core now..." >>$UPDATE_LOG_FILE
 
-	else
-		echo "  ${LOGTIME} - Failed to download core file" >>$LOG_FILE
-		rm -rf /tmp/clash.tar.gz >/dev/null 2>&1
-		echo "" >/tmp/clash_update.txt >/dev/null 2>&1
+		if [ "$download_core_type" -eq 1 ]; then
+			if [ "$CORE_NAME_IN_TAR" != "$CORE_CLASH" ]; then
+				mv "$CORE_NAME_IN_TAR" "$CORE_CLASH"
+			fi
+			rm -rf /usr/share/clash/core_version >/dev/null 2>&1
+			# mv /usr/share/clash/download_core_version /usr/share/clash/core_version >/dev/null 2>&1
+			echo "  $(get_log_time) - Clash core updated successfully" >>$UPDATE_LOG_FILE
+		elif [ "$download_core_type" -eq 3 ]; then
+			if [ "$CORE_NAME_IN_TAR" != "$CORE_CLASH_TUN" ]; then
+				mv "$CORE_NAME_IN_TAR" "$CORE_CLASH_TUN"
+			fi
+			rm -rf /usr/share/clash/tun_version >/dev/null 2>&1
+			# mv /usr/share/clash/download_tun_version /usr/share/clash/tun_version >/dev/null 2>&1
+			# tun=$(sed -n 1p /usr/share/clash/tun_version 2>/dev/null)
+			# sed -i "s/${tun}/v${tun}/g" /usr/share/clash/tun_version 2>&1
+			echo "  $(get_log_time) - Clash core updated successfully" >>$UPDATE_LOG_FILE
+		fi
+
+		touch "$CORE_DOWNLOADED_FLAG" >/dev/null 2>&1
+		rm -rf /var/run/core_update >/dev/null 2>&1
 	fi
+
+	echo "  $(get_log_time) - Now restart clash core" >>$UPDATE_LOG_FILE
 	if pidof clash_core >/dev/null; then
-		if [ $CORETYPE = $CORE ]; then
+		if [ "$download_core_type" = "$(uci get clash.config.core 2>/dev/null)" ]; then
 			/etc/init.d/clash restart >/dev/null
+		fi
+	fi
+	#=============================================================================================
+}
+
+entry() {
+	download_core_type=$(uci get clash.config.dcore 2>/dev/null)
+	if [ "$1" = "check" ]; then
+		check_latest_version
+	elif [ "$1" = "update" ]; then
+		prepare_for_update
+		update
+	else
+		prepare_for_update
+		check_latest_version
+		sleep 1
+		update
+		if [ "$download_core_type" -eq 1 ] || [ "$download_core_type" -eq 3 ] || [ "$download_core_type" -eq 4 ]; then
+			update
 		fi
 	fi
 }
 
-# shellcheck disable=SC2086
-if [ $CORETYPE -eq 1 ] || [ $CORETYPE -eq 3 ] || [ $CORETYPE -eq 4 ]; then
-	update
-fi
+entry "$@"

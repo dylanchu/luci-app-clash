@@ -4,6 +4,8 @@ CORE_CLASH = "/tmp/clash_core"
 CORE_CLASH_TUN = "/etc/clash/clashtun/clash_core"
 CORE_CLASH_DTUN = "/etc/clash/dtun/clash_core"
 
+CORE_DOWNLOADED_FLAG = "/tmp/clash_flag_core_down_complete"
+
 -- log
 LOG_FILE = "/tmp/clash_log.txt"
 REAL_LOG = "/tmp/clash_real_log.txt"

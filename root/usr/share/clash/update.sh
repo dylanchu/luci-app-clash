@@ -1,4 +1,4 @@
-#!/bin/sh /etc/rc.common
+#!/bin/bash /etc/rc.common
 
 # shellcheck source=/dev/null
 . /lib/functions.sh
@@ -9,29 +9,29 @@ config_name=$(uci get clash.config.config_update_name 2>/dev/null)
 SUBSCRIBED_CONFIG_YAML="/usr/share/clash/config/sub/${config_name}"
 # SUBSCRIBED_CONFIG_YAML="/usr/share/clash/config/sub/${config_name}.yaml"
 url=$(grep -F "${config_name}" "/usr/share/clashbackup/confit_list.conf" | awk -F '#' '{print $2}')
-c_type=$(uci get clash.config.config_type 2>/dev/null)
-path=$(uci get clash.config.use_config 2>/dev/null)
 type=$(grep -F "${config_name}" "/usr/share/clashbackup/confit_list.conf" | awk -F '#' '{print $3}')
+cfg_type=$(uci get clash.config.config_type 2>/dev/null)
 
-if [ "$type" = "clash" ] && [ -n "$url" ]; then
+if [ -z "$url" ]; then
+	exit 0
+fi
+
+
+if [ "$type" = "clash" ]; then
 
 	echo "Updating configuration..." >>"$REAL_LOG"
 	wget --no-check-certificate --user-agent="Clash/OpenWRT" "$url" -O "$SUBSCRIBED_CONFIG_YAML" 2>&1
 	if [ "$?" -eq "0" ]; then
 		echo "Configuration Updated." >>"$REAL_LOG"
-		sleep 2
 		use_config=$(uci get clash.config.use_config 2>/dev/null)
-
-		if [ "$c_type" -eq 1 ] && [ "$SUBSCRIBED_CONFIG_YAML" = "$use_config" ]; then
+		if [ "$cfg_type" -eq 1 ] && [ "$SUBSCRIBED_CONFIG_YAML" = "$use_config" ]; then
 			if pidof clash_core >/dev/null; then
 				/etc/init.d/clash restart 2>/dev/null
 			fi
 		fi
-
 	fi
-fi
 
-if [ "$type" = "ssr2clash" ] && [ -n "$url" ]; then
+elif [ "$type" = "ssr2clash" ]; then
 
 	echo "Updating configuration..." >>"$REAL_LOG"
 	wget --no-check-certificate --user-agent="Clash/OpenWRT" "https://ssrsub2clashr.herokuapp.com/ssrsub2clash?sub=$url" -O "$SUBSCRIBED_CONFIG_YAML" 2>&1
@@ -75,28 +75,22 @@ if [ "$type" = "ssr2clash" ] && [ -n "$url" ]; then
 		fi
 
 		echo "Configuration Updated." >>"$REAL_LOG"
-		sleep 2
 		use_config=$(uci get clash.config.use_config 2>/dev/null)
-
-		if [ "$c_type" -eq 1 ] && [ "$SUBSCRIBED_CONFIG_YAML" = "$use_config" ]; then
+		if [ "$cfg_type" -eq 1 ] && [ "$SUBSCRIBED_CONFIG_YAML" = "$use_config" ]; then
 			if pidof clash_core >/dev/null; then
 				/etc/init.d/clash restart 2>/dev/null
 			fi
 		fi
-
 	fi
-fi
 
-if [ "$type" = "v2clash" ] && [ -n "$url" ]; then
+elif [ "$type" = "v2clash" ]; then
 
 	echo "Updating configuration..." >>"$REAL_LOG"
 	wget --no-check-certificate --user-agent="Clash/OpenWRT" "https://tgbot.lbyczf.com/v2rayn2clash?url=$url" -O "$SUBSCRIBED_CONFIG_YAML" 2>&1
 	if [ "$?" -eq "0" ]; then
 		echo "Configuration Updated." >>"$REAL_LOG"
-		sleep 2
 		use_config=$(uci get clash.config.use_config 2>/dev/null)
-
-		if [ "$c_type" -eq 1 ] && [ "$SUBSCRIBED_CONFIG_YAML" = "$use_config" ]; then
+		if [ "$cfg_type" -eq 1 ] && [ "$SUBSCRIBED_CONFIG_YAML" = "$use_config" ]; then
 			if pidof clash_core >/dev/null; then
 				/etc/init.d/clash restart 2>/dev/null
 			fi
