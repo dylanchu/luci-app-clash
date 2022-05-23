@@ -9,6 +9,7 @@ local fs = require "luci.clash"
 local http = luci.http
 local clash = "clash"
 
+dofile "/usr/share/clash/init_env_conf.lua"
 
 c = Map("clash")
 c.template="clash/conf"
@@ -101,10 +102,11 @@ o.inputstyle="apply"
 Button.render(o,t,a)
 end
 btnist.write=function(a,t)
-luci.sys.exec(string.format('uci set clash.config.config_update_name="%s"',e[t].name))
-luci.sys.exec('uci commit clash')
-luci.sys.exec('bash /usr/share/clash/update.sh >>/usr/share/clash/clash.txt 2>&1 &')
-luci.http.redirect(luci.dispatcher.build_url("admin", "services", "clash"))
+	luci.sys.exec(string.format('uci set clash.config.config_update_name="%s"',e[t].name))
+	luci.sys.exec('uci commit clash')
+	local cmd_tpl = 'bash /usr/share/clash/update.sh >>%s 2>&1 &'
+	luci.sys.exec(string.format(cmd_tpl, LOG_FILE))
+	luci.http.redirect(luci.dispatcher.build_url("admin", "services", "clash"))
 end
 
 

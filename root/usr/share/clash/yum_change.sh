@@ -383,7 +383,7 @@ if [ "${fake_ip}" == "fake-ip" ]; then
 		done
 	fi
 
-	echo "Setting up Fake-IP filter..." >>"$REAL_LOG"
+	printf "Setting up Fake-IP filter..." >>"$REAL_LOG"
 	sed -i '/fake-ip-filter:/d' "/etc/clash/config.yaml" 2>/dev/null
 	if grep -qE '^ {0,}fake-ip-range:' "/etc/clash/config.yaml"; then
 		sed -i '/fake-ip-range/a\  fake-ip-filter:' /etc/clash/config.yaml 2>/dev/null
@@ -392,5 +392,5 @@ if [ "${fake_ip}" == "fake-ip" ]; then
 		sed -i '/^enhanced-mode:/a\  fake-ip-filter:' /etc/clash/config.yaml 2>/dev/null
 		sed -i '/fake-ip-filter:/r/usr/share/clash/fake_filter.list' "/etc/clash/config.yaml" 2>/dev/null
 	fi
-	echo "Setting up Fake-IP filter done." >>"$REAL_LOG"
+	printf "%8s\n" "done" >>"$REAL_LOG"
 fi

@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# init like this:
+# # shellcheck source=/dev/null
+# . /usr/share/clash/init_env_conf.sh
+
 # shellcheck disable=SC2034
 # core
 CORE_CLASH="/tmp/clash_core"
@@ -8,10 +12,11 @@ CORE_CLASH_DTUN="/etc/clash/dtun/clash_core"
 GEOIP_FILE="/etc/clash/Country.mmdb"
 
 # log
-LOG_FILE="/usr/share/clash/clash.txt"
-REAL_LOG="/usr/share/clash/clash_real.txt"
+LOG_FILE="/tmp/clash_log.txt"
+REAL_LOG="/tmp/clash_real_log.txt"
+CORE_LOG_FILE=$LOG_FILE
 
-#config
+# config
 CFG_FILE="/etc/config/clash"
 CLASH_CONF_DIR="/etc/clash"
 GEOIP_FILE="$CLASH_CONF_DIR/Country.mmdb"

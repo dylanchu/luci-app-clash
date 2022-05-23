@@ -9,7 +9,7 @@ local fs = require "luci.clash"
 local http = luci.http
 local clash = "clash"
 
-
+dofile "/usr/share/clash/init_env_conf.lua"
 
 
 kr = Map(clash)
@@ -40,10 +40,11 @@ o.title = translate("Download Config")
 o.inputtitle = translate("Download Config")
 o.inputstyle = "reload"
 o.write = function()
-  kr.uci:commit("clash")
-  SYS.call("sh /usr/share/clash/clash.sh >>/usr/share/clash/clash.txt 2>&1 &")
-  SYS.call("sleep 1")
-  HTTP.redirect(DISP.build_url("admin", "services", "clash"))
+	kr.uci:commit("clash")
+	local cmd_tpl = "sh /usr/share/clash/clash.sh >>%s 2>&1 &"
+	luci.sys.call(string.format(cmd_tpl, LOG_FILE))
+	SYS.call("sleep 1")
+	HTTP.redirect(DISP.build_url("admin", "services", "clash"))
 end
 o:depends("subcri", 'clash')
 
@@ -59,9 +60,10 @@ o.title = translate("Download Config")
 o.inputtitle = translate("Download Config")
 o.inputstyle = "reload"
 o.write = function()
-  kr.uci:commit("clash")
-  luci.sys.call("bash /usr/share/clash/clash.sh >>/usr/share/clash/clash.txt 2>&1 &")
-  HTTP.redirect(DISP.build_url("admin", "services", "clash"))
+	kr.uci:commit("clash")
+	local cmd_tpl = "bash /usr/share/clash/clash.sh >>%s 2>&1 &"
+	luci.sys.call(string.format(cmd_tpl, LOG_FILE))
+	HTTP.redirect(DISP.build_url("admin", "services", "clash"))
 end
 o:depends("subcri", 'ssr2clash')
 
@@ -77,9 +79,10 @@ o.title = translate("Download Config")
 o.inputtitle = translate("Download Config")
 o.inputstyle = "reload"
 o.write = function()
-  kr.uci:commit("clash")
-  luci.sys.call("bash /usr/share/clash/clash.sh >>/usr/share/clash/clash.txt 2>&1 &")
-  HTTP.redirect(DISP.build_url("admin", "services", "clash"))
+	kr.uci:commit("clash")
+	local cmd_tpl = "bash /usr/share/clash/clash.sh >>%s 2>&1 &"
+	luci.sys.call(string.format(cmd_tpl, LOG_FILE))
+	HTTP.redirect(DISP.build_url("admin", "services", "clash"))
 end
 o:depends("subcri", 'v2clash')
 

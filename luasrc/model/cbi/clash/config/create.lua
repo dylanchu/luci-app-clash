@@ -356,8 +356,9 @@ o.inputtitle = translate("Download Rule")
 o.description = translate("Download Rule")
 o.inputstyle = "reload"
 o.write = function()
-  uci:commit("clash")
-  luci.sys.call("bash /usr/share/clash/rule.sh >>/usr/share/clash/clash.txt >/dev/null 2>&1 &")
+	uci:commit("clash")
+	local cmd_tpl = "bash /usr/share/clash/rule.sh >>%s >/dev/null 2>&1 &"
+	luci.sys.call(string.format(cmd_tpl, LOG_FILE))
 end
 
 local rule = "/usr/share/clash/rule.yaml"

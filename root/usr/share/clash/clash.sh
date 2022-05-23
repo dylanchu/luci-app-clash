@@ -12,7 +12,7 @@ subtype=$(uci get clash.config.subcri 2>/dev/null)
 
 SUBSCRIBED_CONFIG_YAML="/usr/share/clash/config/sub/${config_name}.yaml"
 
-if [ "$config_name" == "" ] || [ -z "$config_name" ]; then
+if [ "$config_name" = "" ] || [ -z "$config_name" ]; then
 	echo "ERROR: Please tag your config first" >>"$REAL_LOG"
 	exit 0
 fi
@@ -40,7 +40,8 @@ else
 		wget -c4 --no-check-certificate --user-agent="Clash/OpenWRT" "https://gfwsb.114514.best/sub?target=clashr&url=$ssr_url" -O "$SUBSCRIBED_CONFIG_YAML" 2>&1
 		if [ "$?" -eq "0" ]; then
 			echo "${config_name}.yaml#$ssr_url#$subtype" >>/usr/share/clashbackup/confit_list.conf
-			CONFIG_YAMLL="/tmp/conf"
+			TMP_YAML_FILE_1="/tmp/clash_conf_tmp1"
+			TMP_YAML_FILE="/tmp/clash_conf_tmp"
 			da_password=$(uci get clash.config.dash_pass 2>/dev/null)
 			redir_port=$(uci get clash.config.redir_port 2>/dev/null)
 			http_port=$(uci get clash.config.http_port 2>/dev/null)
@@ -50,33 +51,35 @@ else
 			allow_lan=$(uci get clash.config.allow_lan 2>/dev/null)
 			log_level=$(uci get clash.config.level 2>/dev/null)
 			p_mode=$(uci get clash.config.p_mode 2>/dev/null)
-			sed -i "/^Proxy:/i\#clash-openwrt" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
-			sed -i '1,/#clash-openwrt/d' "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
+			cp -f "$SUBSCRIBED_CONFIG_YAML" $TMP_YAML_FILE_1 2>/dev/null
+			sed -i "/^Proxy:/i\#clash-openwrt" "$TMP_YAML_FILE_1" 2>/dev/null
+			sed -i '1,/#clash-openwrt/d' "$TMP_YAML_FILE_1" 2>/dev/null
 
-			cat /usr/share/clash/dns.yaml "$SUBSCRIBED_CONFIG_YAML" >$CONFIG_YAMLL 2>/dev/null
-			mv $CONFIG_YAMLL "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
+			cat /usr/share/clash/dns.yaml "$TMP_YAML_FILE_1" >$TMP_YAML_FILE
+			rm -f $TMP_YAML_FILE_1
 
-			sed -i "1i\#****CLASH-CONFIG-START****#" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
-			sed -i "2i\port: ${http_port}" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
-			sed -i "/port: ${http_port}/a\socks-port: ${socks_port}" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
-			sed -i "/socks-port: ${socks_port}/a\redir-port: ${redir_port}" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
-			sed -i "/redir-port: ${redir_port}/a\allow-lan: ${allow_lan}" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
+			sed -i "1i\#****CLASH-CONFIG-START****#" "$TMP_YAML_FILE" 2>/dev/null
+			sed -i "2i\port: ${http_port}" "$TMP_YAML_FILE" 2>/dev/null
+			sed -i "/port: ${http_port}/a\socks-port: ${socks_port}" "$TMP_YAML_FILE" 2>/dev/null
+			sed -i "/socks-port: ${socks_port}/a\redir-port: ${redir_port}" "$TMP_YAML_FILE" 2>/dev/null
+			sed -i "/redir-port: ${redir_port}/a\allow-lan: ${allow_lan}" "$TMP_YAML_FILE" 2>/dev/null
 
 			if [ "$allow_lan" = "true" ]; then
-				sed -i "/allow-lan: ${allow_lan}/a\bind-address: \"${bind_addr}\"" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
-				sed -i "/bind-address: \"${bind_addr}\"/a\mode: ${p_mode}" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
-				sed -i "/mode: ${p_mode}/a\log-level: ${log_level}" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
-				sed -i "/log-level: ${log_level}/a\external-controller: 0.0.0.0:${dash_port}" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
-				sed -i "/external-controller: 0.0.0.0:${dash_port}/a\secret: \"${da_password}\"" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
-				sed -i "/secret: \"${da_password}\"/a\external-ui: \"/usr/share/clash/dashboard\"" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
+				sed -i "/allow-lan: ${allow_lan}/a\bind-address: \"${bind_addr}\"" "$TMP_YAML_FILE" 2>/dev/null
+				sed -i "/bind-address: \"${bind_addr}\"/a\mode: ${p_mode}" "$TMP_YAML_FILE" 2>/dev/null
+				sed -i "/mode: ${p_mode}/a\log-level: ${log_level}" "$TMP_YAML_FILE" 2>/dev/null
+				sed -i "/log-level: ${log_level}/a\external-controller: 0.0.0.0:${dash_port}" "$TMP_YAML_FILE" 2>/dev/null
+				sed -i "/external-controller: 0.0.0.0:${dash_port}/a\secret: \"${da_password}\"" "$TMP_YAML_FILE" 2>/dev/null
+				sed -i "/secret: \"${da_password}\"/a\external-ui: \"/usr/share/clash/dashboard\"" "$TMP_YAML_FILE" 2>/dev/null
 			else
-				sed -i "/allow-lan: ${allow_lan}/a\mode: Rule" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
-				sed -i "/mode: Rule/a\log-level: ${log_level}" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
-				sed -i "/log-level: ${log_level}/a\external-controller: 0.0.0.0:${dash_port}" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
-				sed -i "/external-controller: 0.0.0.0:${dash_port}/a\secret: \"${da_password}\"" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
-				sed -i "/secret: \"${da_password}\"/a\external-ui: \"/usr/share/clash/dashboard\"" "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
+				sed -i "/allow-lan: ${allow_lan}/a\mode: Rule" "$TMP_YAML_FILE" 2>/dev/null
+				sed -i "/mode: Rule/a\log-level: ${log_level}" "$TMP_YAML_FILE" 2>/dev/null
+				sed -i "/log-level: ${log_level}/a\external-controller: 0.0.0.0:${dash_port}" "$TMP_YAML_FILE" 2>/dev/null
+				sed -i "/external-controller: 0.0.0.0:${dash_port}/a\secret: \"${da_password}\"" "$TMP_YAML_FILE" 2>/dev/null
+				sed -i "/secret: \"${da_password}\"/a\external-ui: \"/usr/share/clash/dashboard\"" "$TMP_YAML_FILE" 2>/dev/null
 			fi
-			sleep 1
+
+			mv $TMP_YAML_FILE "$SUBSCRIBED_CONFIG_YAML" 2>/dev/null
 
 		fi
 	fi

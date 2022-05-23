@@ -1,8 +1,8 @@
 include $(TOPDIR)/rules.mk 
 
 PKG_NAME:=luci-app-clash
-PKG_VERSION:=v1.8.0.2
-PKG_MAINTAINER:=frainzy1477
+PKG_VERSION:=v1.8.0.3
+PKG_MAINTAINER:=dylanchu
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -13,7 +13,7 @@ define Package/$(PKG_NAME)
 	TITLE:=LuCI app for clash
 	DEPENDS:=+luci-base +wget +iptables +coreutils-base64 +coreutils +coreutils-nohup +bash +ipset +libustream-openssl +curl +jsonfilter +ca-certificates +iptables-mod-tproxy +kmod-tun
 	PKGARCH:=all
-	MAINTAINER:=frainzy1477
+	MAINTAINER:=dylanchu
 endef
 
 define Package/$(PKG_NAME)/description
@@ -64,10 +64,11 @@ if [ -z "$${IPKG_INSTROOT}" ]; then
 	rm -rf /usr/share/clash/new_clashr_core_version 2>/dev/null
 	rm -rf /usr/share/clash/new_luci_version 2>/dev/null
 	rm -rf /usr/share/clash/web 2>/dev/null
-	mv /usr/share/clash/config/sub/config.yaml /usr/share/clashbackup/config.bak1 2>/dev/null
-	mv /usr/share/clash/config/upload/config.yaml /usr/share/clashbackup/config.bak2 2>/dev/null
-	mv /usr/share/clash/config/custom/config.yaml /usr/share/clashbackup/config.bak3 2>/dev/null
-	mv /usr/share/clash/rule.yaml /usr/share/clashbackup/rule.bak 2>/dev/null
+	mkdir -p /tmp/clash_tmp_dir 2>/dev/null
+	mv /usr/share/clash/config/sub/config.yaml /tmp/clash_tmp_dir/config.bak1 2>/dev/null
+	mv /usr/share/clash/config/upload/config.yaml /tmp/clash_tmp_dir/config.bak2 2>/dev/null
+	mv /usr/share/clash/config/custom/config.yaml /tmp/clash_tmp_dir/config.bak3 2>/dev/null
+	mv /usr/share/clash/rule.yaml /tmp/clash_tmp_dir/rule.bak 2>/dev/null
 fi
 
 
@@ -80,10 +81,11 @@ define Package/$(PKG_NAME)/postinst
 if [ -z "$${IPKG_INSTROOT}" ]; then
 	rm -rf /tmp/luci*
 	mv /etc/config/clash.bak /etc/config/clash 2>/dev/null
-	mv /usr/share/clashbackup/config.bak1 /usr/share/clash/config/sub/config.yaml 2>/dev/null
-	mv /usr/share/clashbackup/config.bak2 /usr/share/clash/config/upload/config.yaml 2>/dev/null
-	mv /usr/share/clashbackup/config.bak3 /usr/share/clash/config/custom/config.yaml 2>/dev/null
-	mv /usr/share/clashbackup/rule.bak /usr/share/clash/rule.yaml 2>/dev/null
+	mv /tmp/clash_tmp_dir/config.bak1 /usr/share/clash/config/sub/config.yaml 2>/dev/null
+	mv /tmp/clash_tmp_dir/config.bak2 /usr/share/clash/config/upload/config.yaml 2>/dev/null
+	mv /tmp/clash_tmp_dir/config.bak3 /usr/share/clash/config/custom/config.yaml 2>/dev/null
+	mv /tmp/clash_tmp_dir/rule.bak /usr/share/clash/rule.yaml 2>/dev/null
+	rmdir /tmp/clash_tmp_dir 2>/dev/null
 	/etc/init.d/clash disable 2>/dev/null
 fi
 /etc/init.d/clash disable 2>/dev/null
@@ -145,9 +147,7 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) ./root/usr/share/clash/luci_version $(1)/usr/share/clash
 	$(INSTALL_BIN) ./root/usr/share/clash/rule.yaml $(1)/usr/share/clash
 	$(INSTALL_BIN) ./root/usr/share/clash/server.list $(1)/usr/share/clash
-	$(INSTALL_BIN) ./root/usr/share/clash/clash_real.txt $(1)/usr/share/clash
 	$(INSTALL_BIN) ./root/usr/share/clash/logstatus_check $(1)/usr/share/clash
-	$(INSTALL_BIN) ./root/usr/share/clash/clash.txt $(1)/usr/share/clash
 	$(INSTALL_BIN) ./root/usr/share/clash/chinaipset.sh $(1)/usr/share/clash
 	$(INSTALL_BIN) ./root/usr/share/clash/china_ip.txt $(1)/usr/share/clash
 	

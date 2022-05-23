@@ -8,6 +8,9 @@ local uci = require("luci.model.uci").cursor()
 local fs = require "luci.clash"
 local http = luci.http
 
+dofile "/usr/share/clash/init_env_conf.lua"
+
+
 m = Map("clash")
 s = m:section(TypedSection, "clash")
 m.pageaction = false
@@ -22,7 +25,7 @@ o.inputtitle = translate("Download logs")
 o.inputstyle = "apply"
 o.write = function ()
 	local sPath, sFile, fd, block
-	sPath = "/usr/share/clash/clash.txt"
+	sPath = LOG_FILE
 	sFile = NXFS.basename(sPath)
 	if fs.isdirectory(sPath) then
 		fd = io.popen('txt -C "%s" -cz .' % {sPath}, "r")
