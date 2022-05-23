@@ -1,4 +1,4 @@
-name: pack luci-app-clash
+name: luci-app-clash-manually
 
 on: workflow_dispatch
 
