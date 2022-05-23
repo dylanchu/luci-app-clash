@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk 
 
 PKG_NAME:=luci-app-clash
-PKG_VERSION:=v1.8.0.3
+PKG_VERSION:=v1.8.0.4
 PKG_MAINTAINER:=dylanchu
 
 include $(INCLUDE_DIR)/package.mk

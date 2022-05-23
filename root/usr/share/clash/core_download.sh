@@ -12,7 +12,6 @@ get_log_time() {
 }
 
 prepare_for_update() {
-	#=============================================================================================
 	if [ -f $tmp_core_file ]; then
 		rm -rf $tmp_core_file >/dev/null 2>&1
 	fi
@@ -21,12 +20,10 @@ prepare_for_update() {
 	if [ -f "$CORE_DOWNLOADED_FLAG" ]; then
 		rm -rf "$CORE_DOWNLOADED_FLAG" 2>/dev/null
 	fi
-	#=============================================================================================
 }
 
 # shellcheck disable=SC2086
 check_latest_version() {
-	#=============================================================================================
 	echo "  $(get_log_time) - Checking latest version.." >$UPDATE_LOG_FILE
 	if [ $download_core_type -eq 4 ]; then
 
@@ -80,12 +77,10 @@ check_latest_version() {
 		fi
 
 	fi
-	#=============================================================================================
 }
 
 # shellcheck disable=SC2164
 update() {
-	#=============================================================================================
 	tmp_model_type=$(uci get clash.config.download_core 2>/dev/null)
 	if [ -f /tmp/clash.gz ]; then
 		rm -rf /tmp/clash.gz >/dev/null 2>&1
@@ -140,15 +135,18 @@ update() {
 		touch "$CORE_DOWNLOADED_FLAG" >/dev/null 2>&1
 		rm -rf /var/run/core_update >/dev/null 2>&1
 	fi
+}
 
+restart_core() {
 	echo "  $(get_log_time) - Now restart clash core" >>$UPDATE_LOG_FILE
 	if pidof clash_core >/dev/null; then
 		if [ "$download_core_type" = "$(uci get clash.config.core 2>/dev/null)" ]; then
 			/etc/init.d/clash restart >/dev/null
 		fi
 	fi
-	#=============================================================================================
 }
+
+#=============================================================================================================================
 
 entry() {
 	download_core_type=$(uci get clash.config.dcore 2>/dev/null)
@@ -157,14 +155,14 @@ entry() {
 	elif [ "$1" = "update" ]; then
 		prepare_for_update
 		update
-	else
+	elif [ -z "$1" ]; then
 		prepare_for_update
 		check_latest_version
 		sleep 1
-		update
 		if [ "$download_core_type" -eq 1 ] || [ "$download_core_type" -eq 3 ] || [ "$download_core_type" -eq 4 ]; then
 			update
 		fi
+		restart_core
 	fi
 }
 

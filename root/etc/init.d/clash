@@ -389,7 +389,7 @@ start() {
 	if [ "${core}" -eq 1 ] && [ ! -f "$CORE_CLASH" ]; then
 		echo "  $(date "+%Y-%m-%d %H:%M:%S") - Clash core ($CORE_CLASH) not found, trying to download it..." >>"$LOG_FILE"
 		log_real_msg "Clash core not found, trying to download ($CORE_CLASH)..."
-		sh /usr/share/clash/core_download.sh "download" >/tmp/clash_update.txt 2>&1
+		sh /usr/share/clash/core_download.sh "update" >/tmp/clash_update.txt 2>&1
 		if [ "${core}" -eq 1 ] && [ ! -f "$CORE_CLASH" ]; then
 			echo "  $(date "+%Y-%m-%d %H:%M:%S") - Can NOT find clash core ($CORE_CLASH), please install it from update page" >>"$LOG_FILE"
 			exit 11
