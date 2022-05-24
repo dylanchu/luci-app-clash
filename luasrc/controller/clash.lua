@@ -49,15 +49,15 @@ function index()
 	entry({ "admin", "services", "clash", "ping" }, call("act_ping")).leaf = true
 	entry({ "admin", "services", "clash", "readlog" }, call("action_read")).leaf = true
 	entry({ "admin", "services", "clash", "status" }, call("action_status")).leaf = true
-	entry({ "admin", "services", "clash", "check" }, call("check_update_log")).leaf = true
-	entry({ "admin", "services", "clash", "doupdate" }, call("do_update")).leaf = true
+	entry({ "admin", "services", "clash", "check_update_log" }, call("check_update_log")).leaf = true
+	entry({ "admin", "services", "clash", "dlnupdate" }, call("dl_n_update")).leaf = true
 	entry({ "admin", "services", "clash", "start" }, call("do_start")).leaf = true
 	entry({ "admin", "services", "clash", "stop" }, call("do_stop")).leaf = true
 	entry({ "admin", "services", "clash", "reload" }, call("do_reload")).leaf = true
 	entry({ "admin", "services", "clash", "geo" }, call("geoip_check")).leaf = true
 	entry({ "admin", "services", "clash", "geoipupdate" }, call("geoip_update")).leaf = true
 	entry({ "admin", "services", "clash", "check_geoip" }, call("check_geoip_log")).leaf = true
-	entry({ "admin", "services", "clash", "corelog" }, call("down_check")).leaf = true
+	entry({ "admin", "services", "clash", "core_dl_check" }, call("check_core_update")).leaf = true
 	entry({ "admin", "services", "clash", "logstatus" }, call("logstatus_check")).leaf = true
 	entry({ "admin", "services", "clash", "conf" }, call("action_conf")).leaf = true
 	entry({ "admin", "services", "clash", "update_config" }, call("action_update")).leaf = true
@@ -157,83 +157,38 @@ local function localip()
 	return luci.sys.exec("uci get network.lan.ipaddr")
 end
 
-local function check_version()
-	return luci.sys.exec("sh /usr/share/clash/check_luci_version.sh")
-end
-
-local function check_core()
-	return luci.sys.exec("sh /usr/share/clash/check_core_version.sh")
-end
-
-local function check_clashtun_core()
-	return luci.sys.exec("sh /usr/share/clash/check_clashtun_core_version.sh")
-end
-
-local function current_version()
+-- region version begin
+local function app_version()
 	return luci.sys.exec("sed -n 1p /usr/share/clash/luci_version")
 end
 
-local function new_version()
-	return luci.sys.exec("sed -n 1p /usr/share/clash/new_luci_version")
+local function get_core_ver(core_path, name)
+	if nixio.fs.access(core_path) then
+		local ver = luci.sys.exec(core_path .. " -v 2>/dev/null |awk -F ' ' '{print $2}'")
+		if ver ~= "" then
+			return ver
+		else
+			local cmd_tpl = "grep -w %s %s | awk -F '=' '{print $2}' 2>/dev/null"
+			return luci.sys.exec(string.format(cmd_tpl, name, CORE_VERSON_META_FILE))
+		end
+	else
+		return "na"
+	end
 end
 
-local function new_core_version()
-	return luci.sys.exec("sed -n 1p /usr/share/clash/new_core_version")
+local function check_new_versions()
+	return luci.sys.exec("sh /usr/share/clash/check_new_versions.sh")
 end
 
-local function new_clashtun_core_version()
-	return luci.sys.exec("sed -n 1p /usr/share/clash/new_clashtun_core_version")
+local function get_new_ver(name)
+	local cmd_tpl = "grep -w %s %s | awk -F '=' '{print $2}' 2>/dev/null"
+	local ver = luci.sys.exec(string.format(cmd_tpl, name, NEW_VERSON_META_FILE))
+	return ver or "-"
 end
-
-local function check_dtun_core()
-	return luci.sys.call(string.format("sh /usr/share/clash/check_dtun_core_version.sh"))
-end
-
-local function new_dtun_core()
-	return luci.sys.exec("sed -n 1p /usr/share/clash/new_clashdtun_core_version")
-end
+-- region version end
 
 local function e_mode()
 	return luci.sys.exec("egrep '^ {0,}enhanced-mode' /etc/clash/config.yaml |grep enhanced-mode: |awk -F ': ' '{print $2}'")
-end
-
-local function clash_core()
-	if nixio.fs.access(CORE_CLASH) then
-		local core = luci.sys.exec(CORE_CLASH .. " -v 2>/dev/null |awk -F ' ' '{print $2}'")
-		if core ~= "" then
-			return luci.sys.exec(CORE_CLASH .. " -v 2>/dev/null |awk -F ' ' '{print $2}'")
-		else
-			return luci.sys.exec("sed -n 1p /usr/share/clash/core_version")
-		end
-	else
-		return "0"
-	end
-end
-
-local function clashtun_core()
-	if nixio.fs.access(CORE_CLASH_TUN) then
-		local tun = luci.sys.exec(CORE_CLASH_TUN .. " -v 2>/dev/null |awk -F ' ' '{print $2}'")
-		if tun ~= "" then
-			return luci.sys.exec(CORE_CLASH_TUN .. " -v 2>/dev/null |awk -F ' ' '{print $2}'")
-		else
-			return luci.sys.exec("sed -n 1p /usr/share/clash/tun_version")
-		end
-	else
-		return "0"
-	end
-end
-
-local function dtun_core()
-	if nixio.fs.access(CORE_CLASH_DTUN) then
-		local tun = luci.sys.exec(CORE_CLASH_DTUN .. " -v 2>/dev/null |awk -F ' ' '{print $2}'")
-		if tun ~= "" then
-			return luci.sys.exec(CORE_CLASH_DTUN .. " -v 2>/dev/null |awk -F ' ' '{print $2}'")
-		else
-			return luci.sys.exec("sed -n 1p /usr/share/clash/dtun_core_version")
-		end
-	else
-		return "0"
-	end
 end
 
 local function readlog()
@@ -246,13 +201,13 @@ local function geo_date()
 	return os.date("%Y-%m-%d %H:%M:%S", fss.mtime(GEOIP_FILE))
 end
 
-local function downcheck()
+local function update_process_check()
 	if nixio.fs.access("/var/run/core_update_error") then
-		return "0"
+		return "err"
 	elseif nixio.fs.access("/var/run/core_update") then
-		return "1"
+		return "fin"
 	elseif nixio.fs.access(CORE_DOWNLOADED_FLAG) then
-		return "2"
+		return "wip"
 	end
 end
 
@@ -263,10 +218,10 @@ function action_read()
 	})
 end
 
-function down_check()
+function check_core_update()
 	luci.http.prepare_content("application/json")
 	luci.http.write_json({
-		downcheck = downcheck();
+		dlcheck = update_process_check();
 	})
 end
 
@@ -288,20 +243,17 @@ function geoip_check()
 end
 
 function check_status()
+	check_new_versions()
 	luci.http.prepare_content("application/json")
 	luci.http.write_json({
-		check_version = check_version(),
-		check_core = check_core(),
-		current_version = current_version(),
-		new_version = new_version(),
-		clash_core = clash_core(),
-		check_dtun_core = check_dtun_core(),
-		new_dtun_core = new_dtun_core(),
-		clashtun_core = clashtun_core(),
-		dtun_core = dtun_core(),
-		new_core_version = new_core_version(),
-		new_clashtun_core_version = new_clashtun_core_version(),
-		check_clashtun_core = check_clashtun_core(),
+		current_version = app_version(),
+		clash_core = get_core_ver(CORE_CLASH, "core"),
+		clashtun_core = get_core_ver(CORE_CLASH_TUN, "core_tun"),
+		dtun_core = get_core_ver(CORE_CLASH_DTUN, "core_dtun"),
+		new_version = get_new_ver("app"),
+		new_core_ver = get_new_ver("core"),
+		new_tun_core_ver = get_new_ver("core_tun"),
+		new_dtun_core = get_new_ver("core_dtun"),
 		conf_path = conf_path(),
 		typeconf = typeconf()
 	})
@@ -314,15 +266,15 @@ function action_status()
 		clash = is_running(),
 		localip = localip(),
 		dash_port = dash_port(),
-		current_version = current_version(),
-		new_dtun_core = new_dtun_core(),
-		new_core_version = new_core_version(),
-		new_clashtun_core_version = new_clashtun_core_version(),
-		new_version = new_version(),
-		clash_core = clash_core(),
-		dtun_core = dtun_core(),
+		current_version = app_version(),
+		new_version = get_new_ver("app"),
+		new_core_ver = get_new_ver("core"),
+		new_tun_core_ver = get_new_ver("core_tun"),
+		new_dtun_core = get_new_ver("core_dtun"),
+		clash_core = get_core_ver(CORE_CLASH, "core"),
+		dtun_core = get_core_ver(CORE_CLASH_DTUN, "core_dtun"),
 		dash_pass = dash_pass(),
-		clashtun_core = clashtun_core(),
+		clashtun_core = get_core_ver(CORE_CLASH_TUN, "core_tun"),
 		e_mode = e_mode(),
 		in_use = in_use(),
 		conf_path = conf_path(),
@@ -351,9 +303,10 @@ function geoip_update()
 	luci.sys.exec("(rm /var/run/geoip_update_error ;  touch /var/run/geoip_update ; sh /usr/share/clash/geoip.sh >/tmp/geoip_update.txt 2>&1  || touch /var/run/geoip_update_error ;rm /var/run/geoip_update) &")
 end
 
-function do_update()
+function dl_n_update()
 	fs.writefile("/var/run/clashlog", "0")
-	luci.sys.exec("(rm /var/run/core_update_error ;  touch /var/run/core_update ; sh /usr/share/clash/core_download.sh >/tmp/clash_update.txt 2>&1  || touch /var/run/core_update_error ;rm /var/run/core_update) &")
+	luci.sys.call("rm /var/run/core_update_error ;  touch /var/run/core_update")
+	luci.sys.exec("(sh /usr/share/clash/core_download.sh dl_n_update >/tmp/clash_update.txt 2>&1  || touch /var/run/core_update_error ;rm /var/run/core_update) &")
 end
 
 function do_start()

@@ -387,21 +387,32 @@ start() {
 	sleep 1
 
 	if [ "${core}" -eq 1 ] && [ ! -f "$CORE_CLASH" ]; then
-		echo "  $(date "+%Y-%m-%d %H:%M:%S") - Clash core ($CORE_CLASH) not found, trying to download it..." >>"$LOG_FILE"
-		log_real_msg "Clash core not found, trying to download ($CORE_CLASH)..."
+		echo "  $(date "+%Y-%m-%d %H:%M:%S") - Clash core ($CORE_CLASH) not found, trying to download..." >>"$LOG_FILE"
+		log_real_msg "Clash core ($CORE_CLASH) not found, trying to download..."
 		sh /usr/share/clash/core_download.sh "update" >/tmp/clash_update.txt 2>&1
-		if [ "${core}" -eq 1 ] && [ ! -f "$CORE_CLASH" ]; then
-			echo "  $(date "+%Y-%m-%d %H:%M:%S") - Can NOT find clash core ($CORE_CLASH), please install it from update page" >>"$LOG_FILE"
+		if [ ! -f "$CORE_CLASH" ]; then
+			echo "  $(date "+%Y-%m-%d %H:%M:%S") - Automatic download failed" >>"$LOG_FILE"
+			log_real_msg "Automatic download failed, please config from update page."
 			exit 11
 		fi
 	elif [ "${core}" -eq 3 ] && [ ! -f "$CORE_CLASH_TUN" ]; then
-		echo "  $(date "+%Y-%m-%d %H:%M:%S") - Can NOT find Tun core ($CORE_CLASH_TUN)" >>"$LOG_FILE"
-		log_real_msg "Can NOT find Tun core ($CORE_CLASH_TUN)"
-		exit 13
+		echo "  $(date "+%Y-%m-%d %H:%M:%S") - Clash core ($CORE_CLASH_TUN) not found, trying to download..." >>"$LOG_FILE"
+		log_real_msg "Clash core ($CORE_CLASH_TUN) not found, trying to download..."
+		sh /usr/share/clash/core_download.sh "update" >/tmp/clash_update.txt 2>&1
+		if [ ! -f "$CORE_CLASH_TUN" ]; then
+			echo "  $(date "+%Y-%m-%d %H:%M:%S") - Automatic download failed" >>"$LOG_FILE"
+			log_real_msg "Automatic download failed, please config from update page."
+			exit 13
+		fi
 	elif [ "${core}" -eq 4 ] && [ ! -f "$CORE_CLASH_DTUN" ]; then
-		echo "  $(date "+%Y-%m-%d %H:%M:%S") - Can NOT find Tun core ($CORE_CLASH_DTUN)" >>"$LOG_FILE"
-		log_real_msg "Can NOT find Tun core ($CORE_CLASH_DTUN)"
-		exit 14
+		echo "  $(date "+%Y-%m-%d %H:%M:%S") - Clash core ($CORE_CLASH_DTUN) not found, trying to download..." >>"$LOG_FILE"
+		log_real_msg "Clash core ($CORE_CLASH_DTUN) not found, trying to download..."
+		sh /usr/share/clash/core_download.sh "update" >/tmp/clash_update.txt 2>&1
+		if [ ! -f "$CORE_CLASH_DTUN" ]; then
+			echo "  $(date "+%Y-%m-%d %H:%M:%S") - Automatic download failed" >>"$LOG_FILE"
+			log_real_msg "Automatic download failed, please config from update page."
+			exit 14
+		fi
 	fi
 
 	if [ ! -s "$RUNTIME_YAML" ]; then

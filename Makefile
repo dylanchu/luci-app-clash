@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk 
 
 PKG_NAME:=luci-app-clash
-PKG_VERSION:=v1.8.0.4
+PKG_VERSION:=v1.8.0.5
 PKG_MAINTAINER:=dylanchu
 
 include $(INCLUDE_DIR)/package.mk
@@ -60,10 +60,8 @@ if [ -z "$${IPKG_INSTROOT}" ]; then
 	mv /etc/config/clash /etc/config/clash.bak 2>/dev/null
 	rm -rf /usr/lib/lua/luci/model/cbi/clash 2>/dev/null
 	rm -rf /usr/lib/lua/luci/view/clash 2>/dev/null
-	rm -rf /usr/share/clash/new_core_version 2>/dev/null
-	rm -rf /usr/share/clash/new_clashr_core_version 2>/dev/null
-	rm -rf /usr/share/clash/new_luci_version 2>/dev/null
 	rm -rf /usr/share/clash/web 2>/dev/null
+	rm -rf /tmp/clash_new_version_meta 2>/dev/null
 	mkdir -p /tmp/clash_tmp_dir 2>/dev/null
 	mv /usr/share/clash/config/sub/config.yaml /tmp/clash_tmp_dir/config.bak1 2>/dev/null
 	mv /usr/share/clash/config/upload/config.yaml /tmp/clash_tmp_dir/config.bak2 2>/dev/null

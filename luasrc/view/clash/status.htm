@@ -648,8 +648,7 @@
 		}
 	});
 
-
-	XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "services", "clash", "check_status")%>', null, function (x, status) { });
+	XHR.get('<%=luci.dispatcher.build_url("admin", "services", "clash", "check_status")%>', null, function (x, status) { });
 
 //]]></script>
 

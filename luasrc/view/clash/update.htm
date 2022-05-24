@@ -68,12 +68,12 @@
 			version.innerHTML = status.current_version ? '<b><font color="green">' + status.current_version + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
 
 			version_butt.innerHTML = status.current_version ? '<b><font color="green">' + status.new_version + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
-			core_butt.innerHTML = status.current_version ? '<b><font color="green">' + status.new_core_version + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
-			coretun_butt.innerHTML = status.current_version ? '<b><font color="green">' + status.new_clashtun_core_version + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
+			core_butt.innerHTML = status.current_version ? '<b><font color="green">' + status.new_core_ver + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
+			coretun_butt.innerHTML = status.current_version ? '<b><font color="green">' + status.new_tun_core_ver + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
 			coredtun_butt.innerHTML = status.current_version ? '<b><font color="green">' + status.new_dtun_core + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
 		}
 	});
 
-	XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "services", "clash", "check_status")%>', null, function (x, status) { });
+	XHR.get('<%=luci.dispatcher.build_url("admin", "services", "clash", "check_status")%>', null, function (x, status) { });
 
 //]]></script>

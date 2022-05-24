@@ -6,6 +6,9 @@ CORE_CLASH_DTUN = "/etc/clash/dtun/clash_core"
 
 CORE_DOWNLOADED_FLAG = "/tmp/clash_flag_core_down_complete"
 
+CORE_VERSON_META_FILE = "/etc/clash/core_versions"
+NEW_VERSON_META_FILE = "/tmp/clash_new_version_meta"
+
 -- log
 LOG_FILE = "/tmp/clash_log.txt"
 REAL_LOG = "/tmp/clash_real_log.txt"

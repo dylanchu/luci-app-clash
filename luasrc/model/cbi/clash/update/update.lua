@@ -7,7 +7,6 @@ local uci  = require("luci.model.uci").cursor()
 local http = luci.http
 local m, r, k
 
--- env:
 dofile "/usr/share/clash/init_env_conf.lua"
 
 
@@ -60,22 +59,19 @@ http.setfilehandler(
 			fd = nil
 
 			local chmod_tpl = "chmod 755 %s 2>&1 &"
-			local version_tpl = "rm -rf %s 2>/dev/null && %s -v | awk -F ' ' '{print $2}' >> %s 2>/dev/null"
+			local cmd_version_tpl = "sh /usr/share/clash/core_download.sh update_version %s %s"
 			local l_str_saved = translate("File saved to")
 			if fp == "clash" then
 				SYS.exec(string.format(chmod_tpl, CORE_CLASH))
-				local tmp = "/usr/share/clash/core_version"
-				SYS.exec(string.format(version_tpl, tmp, CORE_CLASH, tmp))
+				SYS.exec(string.format(cmd_version_tpl, CORE_CLASH, "core"))
 				um.value = l_str_saved .. ': ' .. CORE_CLASH
 			elseif fp == "clashctun" then
 				SYS.exec(string.format(chmod_tpl, CORE_CLASH_TUN))
-				local tmp = "/usr/share/clash/tun_version"
-				SYS.exec(string.format(version_tpl, tmp, CORE_CLASH_TUN, tmp))
+				SYS.exec(string.format(cmd_version_tpl, CORE_CLASH_TUN, "core_tun"))
 				um.value = l_str_saved .. ': ' .. CORE_CLASH_TUN
 			elseif fp == "clashdtun" then
 				SYS.exec(string.format(chmod_tpl, CORE_CLASH_DTUN))
-				local tmp = "/usr/share/clash/dtun_core_version"
-				SYS.exec(string.format(version_tpl, tmp, CORE_CLASH_DTUN, tmp))
+				SYS.exec(string.format(cmd_version_tpl, CORE_CLASH_DTUN, "core_dtun"))
 				um.value = l_str_saved .. ': ' .. CORE_CLASH_DTUN
 			end
 
@@ -98,40 +94,37 @@ m.pageaction = false
 k = Map("clash")
 s = k:section(TypedSection, "clash", translate("Download Online"))
 s.anonymous = true
+
+o = s:option(Value, "url_dcore")
+o.title = translate("Download Url")
+o.description = translate('Only support ".tar" file and original file inside package should be named to "clash_core".')
+o.placeholder = translate("https://example.com/link/clash-core.tar")
+
 o = s:option(ListValue, "dcore", translate("Core Type"))
 o.default = "clashcore"
 o:value("1", translate("clash"))
 o:value("3", translate("clash(ctun)"))
 o:value("4", translate("clash(premium)"))
 
+o = s:option(Value, "dcore_comments")
+o.title = translate("Comments")
 
-local cpu_model = SYS.exec("opkg status libc 2>/dev/null |grep 'Architecture' |awk -F ': ' '{print $2}' 2>/dev/null")
-o = s:option(ListValue, "download_core", translate("Select Core"))
-o.description = translate("CPU Model") .. ': ' .. font_green .. bold_on .. cpu_model .. bold_off .. font_off .. ' '
-o:value("linux-386")
-o:value("linux-amd64", translate("linux-amd64(x86-64)"))
-o:value("linux-armv5")
-o:value("linux-armv6")
-o:value("linux-armv7")
-o:value("linux-armv8")
-o:value("linux-mips-hardfloat")
-o:value("linux-mips-softfloat")
-o:value("linux-mips64")
-o:value("linux-mips64le")
-o:value("linux-mipsle-softfloat")
-o:value("linux-mipsle-hardfloat")
-
+-- local cpu_model = SYS.exec("opkg status libc 2>/dev/null |grep 'Architecture' |awk -F ': ' '{print $2}' 2>/dev/null")
+-- o = s:option(ListValue, "download_core", translate("Select Core"))
+-- o.description = translate("CPU Model") .. ': ' .. font_green .. bold_on .. cpu_model .. bold_off .. font_off .. ' '
+-- o:value("linux-armv7")
+-- o:value("linux-mipsle-softfloat")
 
 o = s:option(Button, "down_core")
-o.inputtitle = translate("Save & Apply")
-o.title = luci.util.pcdata(translate("Save & Apply"))
+o.inputtitle = translate("Save")
+o.title = luci.util.pcdata(translate("Save"))
 o.inputstyle = "reload"
 o.write = function()
 	k.uci:commit("clash")
 end
 
 o = s:option(Button, "download")
-o.title = translate("Download")
+o.title = translate("Download & Update")
 o.template = "clash/core_check"
 
 

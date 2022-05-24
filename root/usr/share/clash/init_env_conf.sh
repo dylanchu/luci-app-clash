@@ -38,3 +38,8 @@ GROUP_FILE_GAME_RULE="/tmp/yaml_game_rule_group.yaml"
 
 # url
 URL_GITHUB_CORE_DTUN_TAGS="https://github.com/frainzy1477/clashdtun/tags"
+
+# version
+CORE_VERSON_META_FILE="/etc/clash/core_versions"
+NEW_VERSON_META_FILE="/tmp/clash_new_version_meta"
+NEW_VERSON_META_URL="https://github.com/dylanchu/luci-app-clash/releases/download/new_version_meta/new_version_meta"
