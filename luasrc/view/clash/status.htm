@@ -464,38 +464,20 @@
 
 <fieldset class="cbi-section">
 	<table width="100%" cellspacing="10">
-		<tr>
-			<td width="50%"><span> <%:Clash Client%> </span></td><td id="_clash"><em> <%:Checking...%> </em></td>
-		</tr>
-		<tr>
-			<td width="50%"><span><%:Clash Mode%></span></td><td id="_emode"><em><%:Checking...%></em></td>
-		</tr>
-		<tr>
-			<td width="50%"><span><%:Clash Config%></span></td><td id="_conf"><em><%:Checking...%></em></td>
-		</tr>
-		<tr>
-			<td width="50%"><span><%:Config Type%></span></td><td id="_conf_path"><em><%:Checking...%></em></td>
-		</tr>
-		<tr>
-			<td width="50%"><span><%:Clash Dashboard%></span></td><td id="_web"><em><%:Checking...%></em></td>
-		</tr>
-		<tr>
-			<td width="50%"><span><%:Yacd Dashboard%></span></td><td id="_webb"><em><%:Checking...%></em></td>
-		</tr>
+		<tr><td width="50%"><span> <%:Clash Client%> </span></td><td id="_clash"><em> <%:Checking...%> </em></td> </tr>
+		<tr><td width="50%"><span><%:Clash Mode%></span></td><td id="_emode"><em><%:Checking...%></em></td></tr>
+		<tr><td width="50%"><span><%:Clash Config%></span></td><td id="_conf"><em><%:Checking...%></em></td></tr>
+		<tr><td width="50%"><span><%:Config Type%></span></td><td id="_conf_path"><em><%:Checking...%></em></td></tr>
+		<!-- <tr><td width="50%"><span><%:Clash Dashboard%></span></td><td id="_web"><em><%:Checking...%></em></td></tr> -->
+		<tr><td width="50%"><span><%:Yacd Dashboard%></span></td><td id="_webb"><em><%:Checking...%></em></td></tr>
 	</table>
 </fieldset>
 
 <fieldset class="cbi-section">
 	<table width="100%" cellspacing="10">
-		<tr>
-			<td width="50%"><%:Dashboard Host%></td><td id="_ip"><em><%:Checking...%></em></td>
-		</tr>
-		<tr>
-			<td width="50%"><%:Dashboard Port%></td><td id="_port"><em><%:Checking...%></em></td>
-		</tr>
-		<tr>
-			<td width="50%"><%:Dashboard Secret%></td><td id="_secret"><em><%:Checking...%></em></td>
-		</tr>
+		<tr><td width="50%"><%:Dashboard Host%></td><td id="_ip"><em><%:Checking...%></em></td></tr>
+		<tr><td width="50%"><%:Dashboard Port%></td><td id="_port"><em><%:Checking...%></em></td></tr>
+		<tr><td width="50%"><%:Dashboard Secret%></td><td id="_secret"><em><%:Checking...%></em></td></tr>
 	</table>
 </fieldset>
 
@@ -581,7 +563,7 @@
 
 
 	var dnew = document.getElementById('_downloadnew');
-	var web = document.getElementById('_web');
+	// var web = document.getElementById('_web');
 	var webb = document.getElementById('_webb');
 	var clash = document.getElementById('_clash');
 	var ip = document.getElementById('_ip');
@@ -601,7 +583,7 @@
 	HTTP.checker('github.com', 'status_github');
 	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "services", "clash", "status")%>', null, function (x, status) {
 		if (x && x.status == 200) {
-			web.innerHTML = status.clash ? '<a type="button" class="btn" style="background-color:black;padding: 5px;"  href="http://' + window.location.hostname + ':' + status.dash_port + '/ui" target="_blank"><b><font color="green"><%:DASHBOARD%></font></b></a>' : '<b><font color="red"><%:NOT RUNNING%></font></b>';
+			// web.innerHTML = status.clash ? '<a type="button" class="btn" style="background-color:black;padding: 5px;"  href="http://' + window.location.hostname + ':' + status.dash_port + '/ui" target="_blank"><b><font color="green"><%:DASHBOARD%></font></b></a>' : '<b><font color="red"><%:NOT RUNNING%></font></b>';
 			webb.innerHTML = status.clash ? '<a type="button" class="btn" style="background-color:black;padding: 5px;"  href="http://' + window.location.hostname + status.uhttp_port + '/luci-static/yacd?hostname=' + status.localip + '&port=' + status.dash_port + '&secret=' + status.dash_pass + '" target="_blank"><b><font color="green"><%:DASHBOARD%></font></b></a>' : '<b><font color="red"><%:NOT RUNNING%></font></b>';
 			clash.innerHTML = status.clash ? '<b><font color="green"><%:RUNNING%></font> </b>' : '<b><font color="red"><%:NOT RUNNING%></font></b>';
 			ip.innerHTML = status.localip ? '<b><font color="green">' + status.localip + '</font> </b>' : '<em><b><font color="red"><%:NOT SET%></font></b></em>';
