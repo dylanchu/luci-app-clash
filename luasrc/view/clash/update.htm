@@ -10,22 +10,22 @@
 		<tbody>
 			<tr>
 				<td align="center" width="35%">clash</td>
-				<td align="center" width="35%" id="_core"><%:Collecting data...%></td>
+				<td align="center" width="35%" id="_core"><%:Checking...%></td>
 				<td width="35%" align="center" id="_corebutt"><font color="red"><%:Checking...%></font></td>
 			</tr>
 			<tr>
 				<td align="center" width="35%">clash(ctun)</td>
-				<td align="center" width="35%" id="_coretun"><%:Collecting data...%></td>
+				<td align="center" width="35%" id="_coretun"><%:Checking...%></td>
 				<td width="35%" align="center" id="_coretunbutt"><font color="red"><%:Checking...%></font></td>
 			</tr>
 			<tr>
 				<td align="center" width="35%">clash(premium)</td>
-				<td align="center" width="35%" id="_coredtun"><%:Collecting data...%></td>
+				<td align="center" width="35%" id="_coredtun"><%:Checking...%></td>
 				<td width="35%" align="center" id="_coredtunbutt"><font color="red"><%:Checking...%></font></td>
 			</tr>
 			<tr>
 				<td align="center" width="35%">luci-app-clash</td>
-				<td align="center" width="35%" id="_version"><%:Collecting data...%></td>
+				<td align="center" width="35%" id="_version"><%:Checking...%></td>
 				<td width="35%" align="center" id="_versionbutt"><font color="red"><%:Checking...%></font></td>
 			</tr>
 		</tbody>
@@ -50,27 +50,27 @@
 	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "services", "clash", "status")%>', null, function (x, status) {
 		if (x && x.status == 200) {
 
-			if (status.clash_core == 0) {
-				core.innerHTML = status.clash_core ? '<b><font color="red"><%:Not Installed%></font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
+			if (status.clash_core == 'na') {
+				core.innerHTML = '<b><font color="red"><%:Not Installed%></font> </b>';
 			} else {
 				core.innerHTML = status.clash_core ? '<b><font color="green">' + status.clash_core + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
 			}
-			if (status.clashtun_core == 0) {
-				coretun.innerHTML = status.clashtun_core ? '<b><font color="red"><%:Not Installed%></font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
+			if (status.clashtun_core == 'na') {
+				coretun.innerHTML = '<b><font color="red"><%:Not Installed%></font> </b>';
 			} else {
 				coretun.innerHTML = status.clashtun_core ? '<b><font color="green">' + status.clashtun_core + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
 			}
-			if (status.dtun_core == 0) {
-				coredtun.innerHTML = status.dtun_core ? '<b><font color="red"><%:Not Installed%></font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
+			if (status.dtun_core == 'na') {
+				coredtun.innerHTML = '<b><font color="red"><%:Not Installed%></font> </b>';
 			} else {
 				coredtun.innerHTML = status.dtun_core ? '<b><font color="green">' + status.dtun_core + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
 			}
 			version.innerHTML = status.current_version ? '<b><font color="green">' + status.current_version + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
 
-			version_butt.innerHTML = status.current_version ? '<b><font color="green">' + status.new_version + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
-			core_butt.innerHTML = status.current_version ? '<b><font color="green">' + status.new_core_ver + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
-			coretun_butt.innerHTML = status.current_version ? '<b><font color="green">' + status.new_tun_core_ver + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
-			coredtun_butt.innerHTML = status.current_version ? '<b><font color="green">' + status.new_dtun_core + '</font> </b>' : '<em><b><font color="red"><%:Checking...%></font></b></em>';
+			version_butt.innerHTML = status.new_version ? '<b><font color="green">' + status.new_version + '</font> </b>' : '<em> - </em>';
+			core_butt.innerHTML = status.new_core_ver ? '<b><font color="green">' + status.new_core_ver + '</font> </b>' : '<em> - </em>';
+			coretun_butt.innerHTML = status.new_tun_core_ver ? '<b><font color="green">' + status.new_tun_core_ver + '</font> </b>' : '<em> - </em>';
+			coredtun_butt.innerHTML = status.new_dtun_core ? '<b><font color="green">' + status.new_dtun_core + '</font> </b>' : '<em> - </em>';
 		}
 	});
 

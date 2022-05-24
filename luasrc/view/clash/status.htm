@@ -378,7 +378,7 @@
 				</div>
 				<div class="pure-u-16-24">
 					<h4>
-						<%:Baidu%><br><br><span id="status_baidu" class="red"><em><%:Collecting data...%></em></span>
+						<%:Baidu%><br><br><span id="status_baidu" class="red"><em><%:Checking...%></em></span>
 					</h4>
 				</div>
 			</div>
@@ -395,7 +395,7 @@
 				</div>
 				<div class="pure-u-16-24">
 					<h4>
-						<%:Google%><br><br><span id="status_google" class="red"><em><%:Collecting data...%></em></span>
+						<%:Google%><br><br><span id="status_google" class="red"><em><%:Checking...%></em></span>
 					</h4>
 				</div>
 			</div>
@@ -411,7 +411,7 @@
 				</div>
 				<div class="pure-u-16-24">
 					<h4>
-						<%:Youtube%><br><br><span id="status_youtube" class="red"><em><%:Collecting data...%></em></span>
+						<%:Youtube%><br><br><span id="status_youtube" class="red"><em><%:Checking...%></em></span>
 					</h4>
 				</div>
 			</div>
@@ -427,7 +427,7 @@
 				</div>
 				<div class="pure-u-16-24">
 					<h4>
-						<%:GitHub%><br><br><span id="status_github" class="red"><em><%:Collecting data...%></em></span>
+						<%:GitHub%><br><br><span id="status_github" class="red"><em><%:Checking...%></em></span>
 					</h4>
 				</div>
 			</div>
@@ -465,22 +465,22 @@
 <fieldset class="cbi-section">
 	<table width="100%" cellspacing="10">
 		<tr>
-			<td width="50%"><span> <%:Clash Client%> </span></td><td id="_clash"><em> <%:Collecting data...%> </em></td>
+			<td width="50%"><span> <%:Clash Client%> </span></td><td id="_clash"><em> <%:Checking...%> </em></td>
 		</tr>
 		<tr>
-			<td width="50%"><span><%:Clash Mode%></span></td><td id="_emode"><em><%:Collecting data...%></em></td>
+			<td width="50%"><span><%:Clash Mode%></span></td><td id="_emode"><em><%:Checking...%></em></td>
 		</tr>
 		<tr>
-			<td width="50%"><span><%:Clash Config%></span></td><td id="_conf"><em><%:Collecting data...%></em></td>
+			<td width="50%"><span><%:Clash Config%></span></td><td id="_conf"><em><%:Checking...%></em></td>
 		</tr>
 		<tr>
-			<td width="50%"><span><%:Config Type%></span></td><td id="_conf_path"><em><%:Collecting data...%></em></td>
+			<td width="50%"><span><%:Config Type%></span></td><td id="_conf_path"><em><%:Checking...%></em></td>
 		</tr>
 		<tr>
-			<td width="50%"><span><%:Clash Dashboard%></span></td><td id="_web"><em><%:Collecting data...%></em></td>
+			<td width="50%"><span><%:Clash Dashboard%></span></td><td id="_web"><em><%:Checking...%></em></td>
 		</tr>
 		<tr>
-			<td width="50%"><span><%:Yacd Dashboard%></span></td><td id="_webb"><em><%:Collecting data...%></em></td>
+			<td width="50%"><span><%:Yacd Dashboard%></span></td><td id="_webb"><em><%:Checking...%></em></td>
 		</tr>
 	</table>
 </fieldset>
@@ -488,13 +488,13 @@
 <fieldset class="cbi-section">
 	<table width="100%" cellspacing="10">
 		<tr>
-			<td width="50%"><%:Dashboard Host%></td><td id="_ip"><em><%:Collecting data...%></em></td>
+			<td width="50%"><%:Dashboard Host%></td><td id="_ip"><em><%:Checking...%></em></td>
 		</tr>
 		<tr>
-			<td width="50%"><%:Dashboard Port%></td><td id="_port"><em><%:Collecting data...%></em></td>
+			<td width="50%"><%:Dashboard Port%></td><td id="_port"><em><%:Checking...%></em></td>
 		</tr>
 		<tr>
-			<td width="50%"><%:Dashboard Secret%></td><td id="_secret"><em><%:Collecting data...%></em></td>
+			<td width="50%"><%:Dashboard Secret%></td><td id="_secret"><em><%:Checking...%></em></td>
 		</tr>
 	</table>
 </fieldset>
@@ -624,7 +624,7 @@
 				conf_path.innerHTML = status.typeconf ? '<b><font color="red"><%:NOT SELECTED%></font></b>' : '<b><font color="red"><%:NOT RUNNING%></font></b>';
 			}
 			if (status.new_version > status.current_version) {
-				dnew.innerHTML = '<center><br><a href="https://github.com/dylanchu/luci-app-clash/releases" class="btn" style="height:20px;font-size:15px;margin-top:-20px;background-color:#568fa1;color:#ffffff;" target="_blank"><%:Download Update%></a></center>';
+				dnew.innerHTML = '<center><br><a href="https://github.com/dylanchu/luci-app-clash/releases" class="btn" target="_blank"><%:Download Update%></a></center>';
 			}
 
 			IP.getIpifyIP();

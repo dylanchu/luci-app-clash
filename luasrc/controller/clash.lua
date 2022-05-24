@@ -183,7 +183,7 @@ end
 local function get_new_ver(name)
 	local cmd_tpl = "grep -w %s %s | awk -F '=' '{print $2}' 2>/dev/null"
 	local ver = luci.sys.exec(string.format(cmd_tpl, name, NEW_VERSON_META_FILE))
-	return ver or "-"
+	return ver or ""
 end
 -- region version end
 
