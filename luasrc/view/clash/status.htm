@@ -624,7 +624,7 @@
 				conf_path.innerHTML = status.typeconf ? '<b><font color="red"><%:NOT SELECTED%></font></b>' : '<b><font color="red"><%:NOT RUNNING%></font></b>';
 			}
 			if (status.new_version > status.current_version) {
-				dnew.innerHTML = '<center><br><a href="https://github.com/frainzy1477/luci-app-clash/releases/download/' + status.new_version + '/luci-app-clash_' + status.new_version + '_all.ipk" class="btn" style="height:20px;font-size:15px;margin-top:-20px;background-color:#568fa1;color:#ffffff;" target="_blank"><%:Download Update%></a></center>';
+				dnew.innerHTML = '<center><br><a href="https://github.com/dylanchu/luci-app-clash/releases" class="btn" style="height:20px;font-size:15px;margin-top:-20px;background-color:#568fa1;color:#ffffff;" target="_blank"><%:Download Update%></a></center>';
 			}
 
 			IP.getIpifyIP();
