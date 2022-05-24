@@ -7,16 +7,16 @@
 
 c_type=$(uci get clash.config.config_type 2>/dev/null)
 
-countt=$(grep -c '' /usr/share/clashbackup/confit_list.conf)
+countt=$(grep -c '' /usr/share/clash/backup/confit_list.conf)
 count_nums=1
 while [[ $count_nums -le $countt ]]; do
 
-	config_name=$(sed -n "$count_nums"p /usr/share/clashbackup/confit_list.conf | awk -F '#' '{print $1}')
+	config_name=$(sed -n "$count_nums"p /usr/share/clash/backup/confit_list.conf | awk -F '#' '{print $1}')
 
 	SUBSCRIBED_CONFIG_YAML="/usr/share/clash/config/sub/${config_name}"
-	url=$(grep -F "${config_name}" "/usr/share/clashbackup/confit_list.conf" | awk -F '#' '{print $2}')
+	url=$(grep -F "${config_name}" "/usr/share/clash/backup/confit_list.conf" | awk -F '#' '{print $2}')
 
-	type=$(grep -F "${config_name}" "/usr/share/clashbackup/confit_list.conf" | awk -F '#' '{print $3}')
+	type=$(grep -F "${config_name}" "/usr/share/clash/backup/confit_list.conf" | awk -F '#' '{print $3}')
 
 	if [ "$type" = "clash" ] && [ -n "$url" ]; then
 		echo "Start updating configuration..." >>"$REAL_LOG"

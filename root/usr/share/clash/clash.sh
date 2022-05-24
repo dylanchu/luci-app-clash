@@ -17,11 +17,11 @@ if [ "$config_name" = "" ] || [ -z "$config_name" ]; then
 	exit 0
 fi
 
-if [ ! -f "/usr/share/clashbackup/confit_list.conf" ]; then
-	touch /usr/share/clashbackup/confit_list.conf
+if [ ! -f "/usr/share/clash/backup/confit_list.conf" ]; then
+	touch /usr/share/clash/backup/confit_list.conf
 fi
 
-check_name=$(grep -F "${config_name}.yaml" "/usr/share/clashbackup/confit_list.conf")
+check_name=$(grep -F "${config_name}.yaml" "/usr/share/clash/backup/confit_list.conf")
 
 if [ -n "$check_name" ]; then
 	echo "ERROR: Config file with same name exists, please rename the tag and download again" >>"$REAL_LOG"
@@ -32,14 +32,14 @@ else
 	if [ "$subtype" = "clash" ]; then
 		wget -c4 --no-check-certificate --user-agent="Clash/OpenWRT" "$clash_url" -O "$SUBSCRIBED_CONFIG_YAML" 2>&1
 		if [ "$?" -eq "0" ]; then
-			echo "${config_name}.yaml#$clash_url#$subtype" >>/usr/share/clashbackup/confit_list.conf
+			echo "${config_name}.yaml#$clash_url#$subtype" >>/usr/share/clash/backup/confit_list.conf
 		fi
 	fi
 
 	if [ "$subtype" = "ssr2clash" ]; then
 		wget -c4 --no-check-certificate --user-agent="Clash/OpenWRT" "https://gfwsb.114514.best/sub?target=clashr&url=$ssr_url" -O "$SUBSCRIBED_CONFIG_YAML" 2>&1
 		if [ "$?" -eq "0" ]; then
-			echo "${config_name}.yaml#$ssr_url#$subtype" >>/usr/share/clashbackup/confit_list.conf
+			echo "${config_name}.yaml#$ssr_url#$subtype" >>/usr/share/clash/backup/confit_list.conf
 			TMP_YAML_FILE_1="/tmp/clash_conf_tmp1"
 			TMP_YAML_FILE="/tmp/clash_conf_tmp"
 			da_password=$(uci get clash.config.dash_pass 2>/dev/null)
@@ -87,7 +87,7 @@ else
 	if [ "$subtype" = "v2clash" ]; then
 		wget -c4 --no-check-certificate --user-agent="Clash/OpenWRT" "https://tgbot.lbyczf.com/v2rayn2clash?url=$v2_url" -O $SUBSCRIBED_CONFIG_YAML 2>&1
 		if [ "$?" -eq "0" ]; then
-			echo "${config_name}.yaml#$v2_url#$subtype" >>/usr/share/clashbackup/confit_list.conf
+			echo "${config_name}.yaml#$v2_url#$subtype" >>/usr/share/clash/backup/confit_list.conf
 		fi
 	fi
 

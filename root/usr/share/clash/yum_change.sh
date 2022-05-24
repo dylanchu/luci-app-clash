@@ -344,19 +344,19 @@ add_address() {
 		line=$(sed -n "$count_num"p /tmp/server.conf)
 		check_addr=$(grep -F "$line" "/usr/share/clash/server.list")
 		if [ -z "$check_addr" ]; then
-			echo "$line" >>/usr/share/clashbackup/address.list
+			echo "$line" >>/usr/share/clash/backup/address.list
 		fi
 		count_num=$((count_num + 1))
 	done
 
-	sed -i "1i\#START" /usr/share/clashbackup/address.list 2>/dev/null
-	sed -i -e "\$a#END" /usr/share/clashbackup/address.list 2>/dev/null
+	sed -i "1i\#START" /usr/share/clash/backup/address.list 2>/dev/null
+	sed -i -e "\$a#END" /usr/share/clash/backup/address.list 2>/dev/null
 
-	cat /usr/share/clashbackup/address.list /usr/share/clash/server.list >/usr/share/clash/me.list
+	cat /usr/share/clash/backup/address.list /usr/share/clash/server.list >/usr/share/clash/me.list
 	rm -rf /usr/share/clash/server.list
 	mv /usr/share/clash/me.list /usr/share/clash/server.list
 	chmod 755 /usr/share/clash/server.list
-	rm -rf /tmp/server.conf /usr/share/clashbackup/address.list >/dev/null 2>&1
+	rm -rf /tmp/server.conf /usr/share/clash/backup/address.list >/dev/null 2>&1
 }
 
 #fake_ip=$(egrep '^ {0,}enhanced-mode' /etc/clash/config.yaml |grep enhanced-mode: |awk -F ': ' '{print $2}')

@@ -8,8 +8,8 @@
 config_name=$(uci get clash.config.config_update_name 2>/dev/null)
 SUBSCRIBED_CONFIG_YAML="/usr/share/clash/config/sub/${config_name}"
 # SUBSCRIBED_CONFIG_YAML="/usr/share/clash/config/sub/${config_name}.yaml"
-url=$(grep -F "${config_name}" "/usr/share/clashbackup/confit_list.conf" | awk -F '#' '{print $2}')
-type=$(grep -F "${config_name}" "/usr/share/clashbackup/confit_list.conf" | awk -F '#' '{print $3}')
+url=$(grep -F "${config_name}" "/usr/share/clash/backup/confit_list.conf" | awk -F '#' '{print $2}')
+type=$(grep -F "${config_name}" "/usr/share/clash/backup/confit_list.conf" | awk -F '#' '{print $3}')
 cfg_type=$(uci get clash.config.config_type 2>/dev/null)
 
 if [ -z "$url" ]; then

@@ -12,7 +12,7 @@ SCRIPT="/usr/share/clash/create/script.yaml"
 rule_providers=$(uci get clash.config.rule_providers 2>/dev/null)
 config_name=$(uci get clash.config.name_tag 2>/dev/null)
 CUSTOM_CONFIG_YAML="/usr/share/clash/config/custom/${config_name}.yaml"
-check_name=$(grep -F "${config_name}.yaml" "/usr/share/clashbackup/create_list.conf")
+check_name=$(grep -F "${config_name}.yaml" "/usr/share/clash/backup/create_list.conf")
 same_tag=$(uci get clash.config.same_tag 2>/dev/null)
 rcount=$(grep -c "config ruleprovider" "$CFG_FILE" 2>/dev/null)
 create=$(uci get clash.config.provider_config 2>/dev/null)
@@ -1066,9 +1066,9 @@ EOF
       fi
 
       if [ -z "$check_name" ] && [ "${same_tag}" -eq 1 ]; then
-         echo "${config_name}.yaml" >>/usr/share/clashbackup/create_list.conf
+         echo "${config_name}.yaml" >>/usr/share/clash/backup/create_list.conf
       elif [ -z "$check_name" ] && [ "${same_tag}" -eq 0 ]; then
-         echo "${config_name}.yaml" >>/usr/share/clashbackup/create_list.conf
+         echo "${config_name}.yaml" >>/usr/share/clash/backup/create_list.conf
       fi
 
       rm -rf $RULE_PROVIDER $PROVIDER_FILE $GROUP_FILE $RULE_FILE $SERVER_FILE $Proxy_Group
