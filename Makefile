@@ -27,6 +27,10 @@ define Build/Prepare
 	$(CP) $(CURDIR)/root $(PKG_BUILD_DIR)
 	$(CP) $(CURDIR)/luasrc $(PKG_BUILD_DIR)
 	rm -rf $(PKG_BUILD_DIR)/root/usr/share/clash/dashboard
+	chmod 0755 $(PKG_BUILD_DIR)/root/etc/init.d/clash
+	find $(PKG_BUILD_DIR)/root -name *.sh | xargs chmod 0755
+	find $(PKG_BUILD_DIR)/root -name *.lua | xargs chmod 0755
+	chmod 0755 $(PKG_BUILD_DIR)/luasrc -R
 endef
 
 define Build/Configure
@@ -91,60 +95,33 @@ if [ -z "$${IPKG_INSTROOT}" ]; then
 	rmdir /tmp/clash_tmp_dir 2>/dev/null
 	/etc/init.d/clash disable 2>/dev/null
 fi
-chmod 755 /etc/init.d/clash
-find /usr/share/clash -name *.sh | xargs chmod 755
-find /usr/share/clash -name *.lua | xargs chmod 755
-chmod 755 /usr/lib/lua/luci/model/cbi/clash -R
 /etc/init.d/clash disable 2>/dev/null
 
 exit 0
 endef
 
 define Package/$(PKG_NAME)/install
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/clash
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/clash/config
-	
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/clash/dns
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/clash/client
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/clash/game
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/clash/geoip
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/clash/logs
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/clash/update
-	
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/clash
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_DIR) $(1)/etc/config
-	$(INSTALL_DIR) $(1)/etc/clash
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci
-	$(INSTALL_DIR) $(1)/usr/share/
-	$(INSTALL_DIR) $(1)/usr/share/clash
-	$(INSTALL_DIR) $(1)/usr/share/rpcd	
-	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d	
-	$(INSTALL_DIR) $(1)/usr/share/clash/rules
-	$(INSTALL_DIR) $(1)/usr/share/clash/rules/g_rules
-
-	$(INSTALL_DIR) $(1)/etc/clash/dashboard
-
-	$(INSTALL_DIR) $(1)/etc/clash/clashtun
-	$(INSTALL_DIR) $(1)/etc/clash/dtun
 	$(INSTALL_DIR) $(1)/usr/share/clash/backup
-	$(INSTALL_DIR) $(1)/usr/share/clash/create
-	$(INSTALL_DIR) $(1)/etc/clash/provider
-	$(INSTALL_DIR) $(1)/etc/clash/proxyprovider
-	$(INSTALL_DIR) $(1)/etc/clash/ruleprovider
 	$(INSTALL_DIR) $(1)/usr/share/clash/config
 	$(INSTALL_DIR) $(1)/usr/share/clash/config/sub
 	$(INSTALL_DIR) $(1)/usr/share/clash/config/upload
 	$(INSTALL_DIR) $(1)/usr/share/clash/config/custom
 
+	$(INSTALL_DIR) $(1)/etc/clash/dashboard
+	$(INSTALL_DIR) $(1)/etc/clash/clashtun
+	$(INSTALL_DIR) $(1)/etc/clash/dtun
+	$(INSTALL_DIR) $(1)/etc/clash/provider
+	$(INSTALL_DIR) $(1)/etc/clash/proxyprovider
+	$(INSTALL_DIR) $(1)/etc/clash/ruleprovider
+
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
+
 	$(CP) $(PKG_BUILD_DIR)/root/etc/* $(1)/etc/
-	$(CP) $(PKG_BUILD_DIR)/root/usr/share/rpcd/acl.d/luci-app-clash.json $(1)/usr/share/rpcd/acl.d
-	$(CP) $(PKG_BUILD_DIR)/root/usr/share/clash/* $(1)/usr/share/clash/
+	$(CP) $(PKG_BUILD_DIR)/root/usr/share/* $(1)/usr/share/
 	$(CP) $(PKG_BUILD_DIR)/luasrc/* $(1)/usr/lib/lua/luci/
 
-	$(CP) ./po/zh-cn/clash.zh-cn.lmo $(1)/usr/lib/lua/luci/i18n
+	$(CP) ./po/zh-cn/clash.zh-cn.lmo $(1)/usr/lib/lua/luci/i18n/
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
