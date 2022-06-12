@@ -1,14 +1,17 @@
+name: build luci app
+
 on:
   push:
     branches: 
       - test
+  workflow_dispatch: ~
 
-name: luci-app-clash
 jobs:
   build:
+    if: " !startsWith(github.event.head_commit.message, 'WIP') "
     runs-on: ubuntu-22.04
     env:
-      URL: https://downloads.openwrt.org/releases/21.02.3/targets/ramips/mt7620/openwrt-sdk-21.02.3-ramips-mt7620_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+      SDK_URL: https://downloads.openwrt.org/releases/21.02.3/targets/ramips/mt7620/openwrt-sdk-21.02.3-ramips-mt7620_gcc-8.4.0_musl.Linux-x86_64.tar.xz
       REPF: ${{ github.repository }}
       PKGN: ${{ 'luci-app-clash' }}
 
@@ -18,7 +21,7 @@ jobs:
 
     - name: Prepare SDK ENV
       run: |
-        wget -q "${URL}"
+        wget -q "${SDK_URL}"
         tar xJf openwrt-sdk-*.tar.xz -C ../
         mv -f "${GITHUB_WORKSPACE}" ../src
         mv ../openwrt-sdk-* "${GITHUB_WORKSPACE}"
